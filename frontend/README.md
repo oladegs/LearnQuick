@@ -1,6 +1,6 @@
 # LearnQuick Frontend
 
-React frontend for LearnQuick, a full-stack MERN app that turns PDF study documents into interactive learning experiences with AI chat, summaries, flashcards, quizzes, quiz analytics, and progress tracking.
+React frontend for LearnQuick, a full-stack MERN app that turns PDFs and long-form learning material into interactive learning experiences with AI chat, summaries, flashcards, quizzes, quiz analytics, and progress tracking. It is designed for students, busy professionals, readers, researchers, and lifelong learners.
 
 ## Tech Stack
 
@@ -15,6 +15,7 @@ React frontend for LearnQuick, a full-stack MERN app that turns PDF study docume
 
 ## Features
 
+- Audience-friendly learning workflows for school, professional development, research, and personal reading
 - Secure login and registration pages
 - Protected application routes
 - Dashboard with progress overview and recent activity

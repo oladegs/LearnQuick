@@ -1,6 +1,6 @@
 # LearnQuick Backend
 
-Express and Node.js backend for LearnQuick, a full-stack MERN app that transforms PDFs into interactive study tools using MongoDB, JWT authentication, file uploads, and Google Gemini AI.
+Express and Node.js backend for LearnQuick, a full-stack MERN app that transforms PDFs and long-form learning material into interactive learning tools using MongoDB, JWT authentication, file uploads, and Google Gemini AI. The platform supports students, busy professionals, readers, researchers, and lifelong learners.
 
 ## Tech Stack
 

@@ -1,20 +1,28 @@
 # LearnQuick
 
-LearnQuick is a full-stack AI learning assistant that helps students turn study documents into useful learning tools. Users can upload PDF material, ask AI-powered questions, generate summaries, create flashcards, take quizzes, and review progress from one workspace.
+LearnQuick is a full-stack AI learning assistant that helps students, busy professionals, readers, and lifelong learners turn dense documents into useful learning tools. Users can upload PDF material, ask AI-powered questions, generate summaries, create flashcards, take quizzes, and review progress from one workspace.
 
 ## What The App Does
 
-- Helps students study from uploaded documents instead of switching between separate tools.
+- Helps people learn from uploaded documents instead of switching between separate tools.
 - Uses AI to explain concepts, answer document-based questions, generate flashcards, and create quizzes.
-- Tracks study activity through documents, flashcards, quiz results, and dashboard progress.
+- Supports different learning goals, including exam prep, workplace upskilling, professional reading, research review, and personal knowledge building.
+- Tracks learning activity through documents, flashcards, quiz results, and dashboard progress.
 - Provides a responsive frontend with light/dark appearance options and WCAG-focused accessibility controls.
+
+## Who It Is For
+
+- Students who want faster review tools for notes, textbooks, slides, and PDFs.
+- Busy professionals who need to understand reports, manuals, training material, or technical documents quickly.
+- Readers and researchers who want summaries, explanations, and recall practice from long-form content.
+- Lifelong learners who want one place to read, ask questions, practice, and track progress.
 
 ## Project Structure
 
 ```text
 LearnQuick/
   backend/   Express, MongoDB, authentication, uploads, and AI APIs
-  frontend/  React, Vite, Tailwind, protected pages, and study UI
+  frontend/  React, Vite, Tailwind, protected pages, and learning UI
 ```
 
 ## Where To Start
