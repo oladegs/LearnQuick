@@ -1,3 +1,4 @@
+// Builds dashboard progress summaries from documents, flashcards, and quizzes.
 import Document from "../models/Document.js";
 import Flashcard from "../models/Flashcard.js";
 import Quiz from "../models/Quiz.js";

@@ -1,3 +1,4 @@
+// Lists quiz endpoints for fetching, submitting, reviewing results, and deleting quizzes.
 import express from "express";
 import {
   getQuizzes,

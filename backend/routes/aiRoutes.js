@@ -1,3 +1,4 @@
+// Lists AI endpoints for chat, summaries, explanations, flashcards, and quizzes.
 import express from "express";
 import {
   generateFlashcards,

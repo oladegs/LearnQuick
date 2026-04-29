@@ -1,3 +1,4 @@
+// Defines uploaded study documents, including extracted text and processing status.
 import mongoose from "mongoose";
 
 const documentSchema = new mongoose.Schema(

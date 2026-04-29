@@ -1,3 +1,4 @@
+// Handles document uploads, PDF text extraction, document lists, and document cleanup.
 import { stat } from "fs";
 import Document from "../models/Document.js";
 import Flashcard from "../models/Flashcard.js";

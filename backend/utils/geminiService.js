@@ -1,3 +1,4 @@
+// Wraps Google Gemini calls for summaries, explanations, chat, flashcards, and quizzes.
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 

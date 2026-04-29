@@ -1,3 +1,4 @@
+// Defines flashcards generated from documents and the student's review progress.
 import mongoose from "mongoose";
 
 const flashcardSchema = new mongoose.Schema(

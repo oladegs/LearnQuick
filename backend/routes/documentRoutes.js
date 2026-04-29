@@ -1,3 +1,4 @@
+// Lists the document API endpoints for uploading, reading, updating, and deleting PDFs.
 import express from "express";
 import {
   uploadDocument,

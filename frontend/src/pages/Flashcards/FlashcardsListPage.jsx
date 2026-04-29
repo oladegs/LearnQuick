@@ -1,3 +1,4 @@
+// Lists all available flashcard sets so students can choose what to review.
 import React, { useState, useEffect } from 'react';
 import flashcardService from '../../services/flashcardService';
 import PageHeader from '../../components/common/PageHeader';

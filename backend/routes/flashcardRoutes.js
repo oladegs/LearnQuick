@@ -1,3 +1,4 @@
+// Lists flashcard endpoints for viewing, reviewing, starring, and deleting cards.
 import express from "express";
 import {
   getFlashcards,

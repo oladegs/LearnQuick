@@ -1,3 +1,4 @@
+// Shows a dashboard summary of documents, flashcards, quizzes, and recent study activity.
 import React, { useState, useEffect } from "react";
 import Spinner from "../../components/common/Spinner";
 import progressService from "../../services/progressService";

@@ -1,3 +1,4 @@
+// Splits long document text into smaller pieces so AI requests stay manageable.
 /**
  * Split text into chunks for better AI processing
  * @param {string} text - Full text to chunk

@@ -1,3 +1,4 @@
+// Starts the API server, connects shared middleware, serves uploads, and registers every route group.
 import dotenv from "dotenv";
 dotenv.config();
 

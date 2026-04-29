@@ -1,3 +1,4 @@
+// Lists the account-related API endpoints, such as register, login, and profile.
 import express from "express";
 import { body } from "express-validator";
 import {

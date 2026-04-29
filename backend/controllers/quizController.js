@@ -1,3 +1,4 @@
+// Handles quiz retrieval, submission scoring, result review, and deletion.
 import Quiz from "../models/Quiz.js";
 
 const normalizeAnswer = (value) =>

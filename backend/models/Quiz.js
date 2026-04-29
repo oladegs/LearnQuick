@@ -1,3 +1,4 @@
+// Defines AI-generated quizzes, questions, answers, scores, and submission history.
 import mongoose from "mongoose";
 
 const quizSchema = new mongoose.Schema(

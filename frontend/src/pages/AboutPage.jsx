@@ -1,3 +1,4 @@
+// Explains what LearnQuick does and highlights the AI learning assistant features.
 import React from "react";
 import {
   BrainCircuit,

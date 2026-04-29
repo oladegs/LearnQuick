@@ -1,3 +1,4 @@
+// Connects the backend to MongoDB so app data can be saved and read.
 import mongoose from "mongoose";
 
 const connectDB = async () => {

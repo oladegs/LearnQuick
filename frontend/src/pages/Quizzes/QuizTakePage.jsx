@@ -1,3 +1,4 @@
+// Lets a student answer quiz questions and submit their responses for grading.
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";

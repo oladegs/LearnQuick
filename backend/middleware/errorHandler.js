@@ -1,3 +1,4 @@
+// Turns backend errors into consistent JSON responses the frontend can understand.
 const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || "Server Error";

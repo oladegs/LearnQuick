@@ -1,3 +1,4 @@
+// Shows quiz scores, selected answers, correct answers, and explanations after submission.
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import quizService from "../../services/quizService";

@@ -1,3 +1,4 @@
+// Saves AI chat messages so users can return to previous document conversations.
 import mongoose from "mongoose";
 
 const chatHistorySchema = new mongoose.Schema(

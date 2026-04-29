@@ -1,3 +1,4 @@
+// Shows one uploaded document, its study tools, AI chat, flashcards, and quizzes.
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import documentService from "../../services/documentService";

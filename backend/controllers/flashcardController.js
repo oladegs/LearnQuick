@@ -1,3 +1,4 @@
+// Handles flashcard retrieval, review status updates, favorites, and deletion.
 import Flashcard from "../models/Flashcard.js";
 
 // @desc    Get all flashcards for a document

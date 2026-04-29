@@ -1,3 +1,4 @@
+// Handles user accounts: registration, login, profile details, and password changes.
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import User from "../models/User.js";

@@ -1,3 +1,4 @@
+// Defines what a user account looks like and how passwords are securely stored.
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 

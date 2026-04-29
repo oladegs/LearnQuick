@@ -1,3 +1,4 @@
+// Lists progress endpoints that feed the dashboard with study activity summaries.
 import express from "express";
 import { getDashboard } from "../controllers/progressController.js";
 import protect from "../middleware/auth.js";

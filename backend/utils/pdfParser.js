@@ -1,3 +1,4 @@
+// Reads uploaded PDF files and extracts their text so AI features can use the content.
 import fs from "fs/promises";
 import { PDFParse } from "pdf-parse";
 

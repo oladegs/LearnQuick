@@ -1,3 +1,4 @@
+// Displays the signed-in user's profile details and lets them change their password.
 import React, { useState, useEffect } from "react";
 import PageHeader from "../../components/common/PageHeader";
 import Button from "../../components/common/Button";

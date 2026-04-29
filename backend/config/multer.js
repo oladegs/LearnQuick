@@ -1,3 +1,4 @@
+// Configures PDF upload storage, file type checks, and upload size limits.
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
