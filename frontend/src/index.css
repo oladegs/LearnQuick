@@ -1,0 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --font-display: "Urbanist", sans-serif;
+  --breakpoint-3xl: 120px;
+  --color-primary: #ff9324;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-display);
+  }
+
+  body {
+    background-color: white;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  .dark body {
+    background-color: #020617;
+    color: #e2e8f0;
+  }
+}
+
+@layer utilities {
+  .dark .bg-white,
+  .dark .bg-white\/80,
+  .dark .bg-white\/90,
+  .dark .bg-white\/95 {
+    background-color: rgb(15 23 42 / 0.9) !important;
+  }
+
+  .dark .bg-slate-50,
+  .dark .bg-slate-50\/50,
+  .dark .from-slate-50,
+  .dark .from-slate-50\/50,
+  .dark .to-white,
+  .dark .to-white\/50,
+  .dark .via-white {
+    --tw-gradient-from: rgb(15 23 42 / 0.82) var(--tw-gradient-from-position) !important;
+    --tw-gradient-via: rgb(15 23 42 / 0.88) var(--tw-gradient-via-position) !important;
+    --tw-gradient-to: rgb(2 6 23 / 0.88) var(--tw-gradient-to-position) !important;
+    background-color: rgb(15 23 42 / 0.82) !important;
+  }
+
+  .dark .bg-slate-100,
+  .dark .bg-neutral-100,
+  .dark .from-slate-100,
+  .dark .to-slate-200\/50 {
+    background-color: rgb(30 41 59 / 0.9) !important;
+  }
+
+  .dark .border-slate-100,
+  .dark .border-slate-200,
+  .dark .border-slate-200\/60,
+  .dark .border-neutral-200 {
+    border-color: rgb(51 65 85 / 0.75) !important;
+  }
+
+  .dark .text-slate-900,
+  .dark .text-neutral-900 {
+    color: #f1f5f9 !important;
+  }
+
+  .dark .text-slate-700,
+  .dark .text-neutral-700,
+  .dark .text-neutral-600 {
+    color: #cbd5e1 !important;
+  }
+
+  .dark .text-slate-600,
+  .dark .text-slate-500 {
+    color: #94a3b8 !important;
+  }
+
+  .dark .placeholder-slate-400::placeholder {
+    color: #64748b !important;
+  }
+
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: rgb(15 23 42 / 0.85) !important;
+    border-color: rgb(51 65 85 / 0.9) !important;
+    color: #f1f5f9 !important;
+  }
+}

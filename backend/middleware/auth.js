@@ -1,0 +1,53 @@
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+
+const protect = async (req, res, next) => {
+  const authHeader = req.headers.authorization?.trim();
+  const bearerMatch = authHeader?.match(/^Bearer\s+(.+)$/i);
+  let token = bearerMatch?.[1]?.trim() || req.headers["x-auth-token"];
+
+  if (typeof token === "string") {
+    token = token.replace(/^"+|"+$/g, "").trim();
+  }
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      error: "Not authorized, no token",
+      statusCode: 401,
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select("-password");
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: "User not found",
+        statusCode: 401,
+      });
+    }
+
+    next();
+  } catch (error) {
+    console.error("Auth middleware error:", error.message);
+
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        error: "Token has expired",
+        statusCode: 401,
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      error: "Not authorized, token failed",
+      statusCode: 401,
+    });
+  }
+};
+
+export default protect;
