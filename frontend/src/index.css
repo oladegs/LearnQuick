@@ -12,6 +12,7 @@
 @layer base {
   html {
     font-family: var(--font-display);
+    scroll-behavior: smooth;
   }
 
   body {
@@ -23,9 +24,92 @@
     background-color: #020617;
     color: #e2e8f0;
   }
+
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  [tabindex]:not([tabindex="-1"]) {
+    outline-offset: 3px;
+  }
+
+  :focus-visible {
+    outline: 3px solid #059669;
+    outline-offset: 3px;
+  }
+
+  main:focus {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer utilities {
+  .a11y-large-text {
+    font-size: 112.5%;
+  }
+
+  .a11y-high-contrast body {
+    background-color: #ffffff;
+    color: #020617;
+  }
+
+  .dark.a11y-high-contrast body {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .a11y-high-contrast :focus-visible {
+    outline-color: #f59e0b;
+    outline-width: 4px;
+  }
+
+  .a11y-high-contrast button,
+  .a11y-high-contrast a,
+  .a11y-high-contrast input,
+  .a11y-high-contrast textarea,
+  .a11y-high-contrast select {
+    border-color: currentColor !important;
+  }
+
+  .a11y-high-contrast .text-slate-500,
+  .a11y-high-contrast .text-slate-600,
+  .a11y-high-contrast .text-slate-700,
+  .a11y-high-contrast .text-neutral-600,
+  .a11y-high-contrast .text-neutral-700 {
+    color: #0f172a !important;
+  }
+
+  .dark.a11y-high-contrast .text-slate-400,
+  .dark.a11y-high-contrast .text-slate-500,
+  .dark.a11y-high-contrast .text-slate-600,
+  .dark.a11y-high-contrast .text-slate-700,
+  .dark.a11y-high-contrast .text-neutral-600,
+  .dark.a11y-high-contrast .text-neutral-700 {
+    color: #ffffff !important;
+  }
+
+  .a11y-reduce-motion,
+  .a11y-reduce-motion *,
+  .a11y-reduce-motion *::before,
+  .a11y-reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
   .dark .bg-white,
   .dark .bg-white\/80,
   .dark .bg-white\/90,
@@ -86,5 +170,15 @@
     background-color: rgb(15 23 42 / 0.85) !important;
     border-color: rgb(51 65 85 / 0.9) !important;
     color: #f1f5f9 !important;
+  }
+
+  @media (forced-colors: active) {
+    button,
+    a,
+    input,
+    textarea,
+    select {
+      forced-color-adjust: auto;
+    }
   }
 }

@@ -25,11 +25,37 @@ React frontend for LearnQuick, a full-stack MERN app that turns PDF study docume
 - Flashcards tab with generated flashcard sets and flip-card review
 - Flashcard listing page
 - About page explaining what LearnQuick does
+- Accessibility menu with larger text, high contrast, and reduced motion options
 - Quiz tab with generated quizzes
 - Quiz take page
 - Quiz result page with detailed answers, explanations, and score breakdown
 - Profile page
 - Responsive Tailwind UI for desktop and mobile
+
+## Accessibility
+
+LearnQuick includes WCAG-focused accessibility support in the shared app layout:
+
+- Keyboard-accessible sidebar, appearance, and accessibility controls
+- Skip-to-content link for keyboard and screen reader users
+- Visible focus indicators with strong contrast
+- Semantic `main` landmark for protected app pages
+- Accessible labels on icon-only header controls
+- Persistent accessibility preferences in `localStorage`
+- Larger text option for readability
+- High contrast option for stronger foreground/background separation
+- Reduced motion option, plus support for the system `prefers-reduced-motion` setting
+- Dark, light, and device-default appearance modes
+
+When adding new UI, keep these checks in mind:
+
+- Use real buttons and links for interactive controls.
+- Add `aria-label` to icon-only buttons.
+- Keep heading order logical.
+- Do not rely on color alone to communicate state.
+- Make sure every form input has a visible label.
+- Test keyboard navigation with `Tab`, `Shift + Tab`, `Enter`, `Space`, and `Escape`.
+- Maintain readable color contrast in light, dark, and high contrast modes.
 
 ## Clone The Project
 

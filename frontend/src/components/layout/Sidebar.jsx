@@ -48,6 +48,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
       {/* Sidebar */}
       <aside
+        id="app-sidebar"
+        aria-label="Primary navigation"
         className={`fixed top-0 left-0 h-full w-64 overflow-hidden bg-white/90 backdrop-blur-lg border-r border-slate-200/60 z-50 transition-all duration-300 dark:bg-slate-900/95 dark:border-slate-800
           md:relative md:shrink-0 md:flex md:flex-col ease-in-out ${
             isSidebarOpen
@@ -76,6 +78,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           <button
             onClick={toggleSidebar}
             className="md:hidden text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
+            aria-label="Close sidebar"
           >
             <X size={24} />
           </button>

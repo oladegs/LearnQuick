@@ -2,8 +2,9 @@ import React from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Bell, User, Menu } from "lucide-react";
 import AppearanceMenu from "./AppearanceMenu";
+import AccessibilityMenu from "./AccessibilityMenu";
 
-const Header = ({ toggleSidebar }) => {
+const Header = ({ toggleSidebar, isSidebarOpen }) => {
   const { user } = useAuth();
 
   return (
@@ -14,6 +15,8 @@ const Header = ({ toggleSidebar }) => {
           onClick={toggleSidebar}
           className="inline-flex items-center justify-center w-10 h-10 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800"
           aria-label="Toggle sidebar"
+          aria-controls="app-sidebar"
+          aria-expanded={isSidebarOpen}
         >
           <Menu size={24} />
         </button>
@@ -21,9 +24,13 @@ const Header = ({ toggleSidebar }) => {
         <div className="hidden md:block"></div>
 
         <div className="flex items-center gap-3">
+          <AccessibilityMenu />
           <AppearanceMenu />
 
-          <button className="relative inline-flex items-center justify-center w-10 h-10 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200 group dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800">
+          <button
+            className="relative inline-flex items-center justify-center w-10 h-10 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all duration-200 group dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800"
+            aria-label="Notifications"
+          >
             <Bell
               size={20}
               strokeWidth={2}
