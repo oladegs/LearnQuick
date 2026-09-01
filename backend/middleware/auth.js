@@ -1,11 +1,15 @@
 // Protects private API routes by checking the user's JWT login token.
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { AUTH_COOKIE_NAME } from "../utils/authTokens.js";
 
 const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization?.trim();
   const bearerMatch = authHeader?.match(/^Bearer\s+(.+)$/i);
-  let token = bearerMatch?.[1]?.trim() || req.headers["x-auth-token"];
+  let token =
+    bearerMatch?.[1]?.trim() ||
+    req.cookies?.[AUTH_COOKIE_NAME] ||
+    req.headers["x-auth-token"];
 
   if (typeof token === "string") {
     token = token.replace(/^"+|"+$/g, "").trim();

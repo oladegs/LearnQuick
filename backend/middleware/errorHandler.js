@@ -46,11 +46,15 @@ const errorHandler = (err, req, res, next) => {
     stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
   });
 
+  const publicMessage =
+    statusCode >= 500 && statusCode !== 503
+      ? "The server could not complete the request. Please try again."
+      : message;
+
   res.status(statusCode).json({
     success: false,
-    error: message,
+    error: publicMessage,
     statusCode,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };
 

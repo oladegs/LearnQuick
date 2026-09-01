@@ -70,11 +70,24 @@ export const generateFlashcards = async (req, res, next) => {
 export const generateQuiz = async (req, res, next) => {
   try {
     const { documentId, numQuestions = 5, title } = req.body;
+    const questionCount = Number(numQuestions);
 
     if (!documentId) {
       return res.status(400).json({
         success: false,
         error: "Please provide documentId",
+        statusCode: 400,
+      });
+    }
+
+    if (
+      !Number.isInteger(questionCount) ||
+      questionCount < 1 ||
+      questionCount > 20
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: "numQuestions must be a whole number between 1 and 20",
         statusCode: 400,
       });
     }
@@ -96,8 +109,18 @@ export const generateQuiz = async (req, res, next) => {
     // Generate quiz using Gemini
     const questions = await geminiService.generateQuiz(
       document.extractedText,
-      parseInt(numQuestions),
+      questionCount,
     );
+
+    // Never persist an unusable quiz if Gemini returned text that could not be
+    // parsed into valid multiple-choice questions.
+    if (questions.length === 0) {
+      const generationError = new Error(
+        "Gemini did not return any valid quiz questions. Please try again.",
+      );
+      generationError.statusCode = 502;
+      throw generationError;
+    }
 
     // Save to database
     const quiz = await Quiz.create({
