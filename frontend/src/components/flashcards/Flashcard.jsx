@@ -8,19 +8,30 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
     setIsFlipped(!isFlipped);
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleFlip();
+    }
+  };
+
 return (
   <div className="relative w-full h-72" style={{ perspective: "1000px" }}>
     <div
       className="relative w-full h-full transition-transform duration-500 transform-gpu cursor-pointer"
+      role="button"
+      tabIndex={0}
+      aria-label={isFlipped ? "Showing flashcard answer. Activate to show question." : "Showing flashcard question. Activate to reveal answer."}
       style={{
         transformStyle: "preserve-3d",
         transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
       }}
       onClick={handleFlip}
+      onKeyDown={handleKeyDown}
     >
       {/* Front of the card (Question) */}
       <div
-        className="absolute inset-0 w-full h-full bg-white/80 backdrop-blur-xl border-2 border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/50 p-8 flex flex-col justify-between"
+        className="absolute inset-0 flex h-full w-full flex-col justify-between rounded-2xl border border-white/10 bg-[#111827]/85 p-8 shadow-xl shadow-black/20 backdrop-blur-xl"
         style={{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",
@@ -28,7 +39,7 @@ return (
       >
         {/* Star Button */}
         <div className="flex items-start justify-between">
-          <div className="bg-slate-100 text-[10px] text-slate-600 rounded px-4 py-1 uppercase">
+          <div className="bg-white/[0.06] text-[10px] text-slate-400 rounded px-4 py-1 uppercase">
             {flashcard?.difficulty}
           </div>
 
@@ -40,7 +51,7 @@ return (
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
               flashcard.isStarred
                 ? "bg-linear-to-br from-amber-400 to-yellow-500 text-white shadow-lg shadow-amber-500/25"
-                : "bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-amber-500"
+                : "bg-white/[0.06] text-slate-400 hover:bg-white/10 hover:text-amber-500"
             }`}
           >
             <Star
@@ -53,7 +64,7 @@ return (
 
         {/* Question Content */}
         <div className="flex-1 flex items-center justify-center px-4 py-6">
-          <p className="text-lg font-semibold text-slate-900 text-center leading-relaxed">
+          <p className="text-lg font-semibold text-white text-center leading-relaxed">
             {flashcard.question}
           </p>
         </div>
@@ -67,7 +78,7 @@ return (
 
       {/* Back of the card (Answer) */}
       <div
-        className="absolute inset-0 w-full h-full bg-linear-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-xl shadow-emerald-500/25 p-8 flex flex-col justify-between text-white"
+        className="absolute inset-0 flex h-full w-full flex-col justify-between rounded-2xl bg-linear-to-br from-sky-500 to-sky-600 p-8 text-white shadow-xl shadow-sky-500/25"
         style={{
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",

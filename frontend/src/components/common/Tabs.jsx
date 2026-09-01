@@ -3,27 +3,27 @@ import React from "react";
 const Tabs = ({ tabs, activeTab, setActiveTab }) => {
   return (
     <div className="w-full">
-      <div className="relative border-b-2 border-slate-100">
-        <nav className="flex gap-2">
+      <div className="relative border-b border-white/10">
+        <nav className="flex gap-2 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.name}
               onClick={() => setActiveTab(tab.name)}
-              className={`relative pb-4 px-2 md:px-6 text-sm font-semibold transition-all duration-200 ${
+              className={`relative shrink-0 px-3 pb-4 text-sm font-semibold transition-all duration-200 md:px-6 ${
                 activeTab === tab.name
-                  ? "text-emerald-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "text-sky-300"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               <span className="relative z-10">{tab.label}</span>
 
               {activeTab === tab.name && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-lg shadow-emerald-500/25" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-sky-400 shadow-lg shadow-sky-500/30" />
               )}
 
               {activeTab === tab.name && (
                 <div
-                  className="absolute inset-0 bg-gradient-to-b from-emerald-50/50 to-transparent
+                  className="absolute inset-0 bg-gradient-to-b from-sky-500/10 to-transparent
                 rounded-t-xl -z-10"
                 />
               )}
@@ -36,7 +36,7 @@ const Tabs = ({ tabs, activeTab, setActiveTab }) => {
         {tabs.map((tab) => {
           if (tab.name === activeTab) {
             return (
-              <div key={tab.name} className="animate-in fade-in duration-300">
+              <div key={tab.name} className="min-w-0">
                 {tab.content}
               </div>
             );

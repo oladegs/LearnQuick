@@ -16,9 +16,11 @@ React frontend for LearnQuick, a full-stack MERN app that turns PDFs and long-fo
 ## Features
 
 - Audience-friendly learning workflows for school, professional development, research, and personal reading
-- Secure login and registration pages
+- Manual email/password login and registration, with Google as an additional option
+- Forgot/reset password pages and profile password management
 - Protected application routes
 - Dashboard with progress overview and recent activity
+- Orange, white, and charcoal design system with light, dark, and device themes
 - Document listing and upload modal
 - Embedded PDF viewer in the document details page
 - AI chat interface for document questions
@@ -31,6 +33,7 @@ React frontend for LearnQuick, a full-stack MERN app that turns PDFs and long-fo
 - Quiz take page
 - Quiz result page with detailed answers, explanations, and score breakdown
 - Profile page
+- Authenticated feedback page with rating, categories, and submission history
 - Responsive Tailwind UI for desktop and mobile
 
 ## Accessibility
@@ -79,7 +82,7 @@ npm install
 
 ## Environment Setup
 
-The frontend currently uses `http://localhost:8000` as the default backend API URL in `src/utils/apiPaths.js`.
+The frontend uses `VITE_API_URL`, with `http://localhost:8000` as its local fallback.
 
 Create a `.env` file in this frontend folder if you want to document or reuse the API URL:
 
@@ -87,7 +90,7 @@ Create a `.env` file in this frontend folder if you want to document or reuse th
 VITE_API_URL=http://localhost:8000
 ```
 
-Note: most API calls currently use the hardcoded `BASE_URL` in `src/utils/apiPaths.js`. If you deploy the backend or change ports, update that value or wire `BASE_URL` to `import.meta.env.VITE_API_URL`.
+Set `VITE_API_URL` to the deployed backend origin in production.
 
 ## Run The Frontend
 
@@ -125,8 +128,9 @@ Before testing the frontend, check:
 
 - The backend server is running on `http://localhost:8000`.
 - MongoDB is connected through the backend.
-- The backend `.env` includes `MONGODB_URI`, `JWT_SECRET`, and `GEMINI_API_KEY`.
-- You have registered or logged in so a JWT token exists in local storage.
+- The backend `.env` includes `MONGODB_URI`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GEMINI_API_KEY`.
+- `GET /api/auth/providers` reports `google: true`.
+- You completed Google sign-in and the backend set the HttpOnly LearnQuick session cookie.
 - Uploaded PDFs have finished processing before using AI features.
 - If the PDF viewer does not load, confirm the backend `/uploads` static route is reachable.
 - If AI chat, summaries, flashcards, or quizzes fail, confirm the Gemini API key is valid on the backend.
@@ -158,6 +162,7 @@ src/
 
 - `/login`
 - `/register`
+- `/auth/callback`
 - `/dashboard`
 - `/documents`
 - `/documents/:id`
@@ -167,11 +172,12 @@ src/
 - `/quizzes/:quizId/results`
 - `/about`
 - `/profile`
+- `/feedback`
 
 ## Notes
 
 - Start the backend before using protected app features.
-- The app expects JWT authentication and sends the token from `localStorage` through Axios.
+- Email/password and Google use the same account/session system. The app restores JWT sessions from an HttpOnly cookie; bearer-token support remains available for compatible API clients.
 - Quiz scoring is handled by the backend, while the result page also normalizes answers for accurate display.
 
 ## Author

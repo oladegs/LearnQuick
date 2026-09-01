@@ -1,34 +1,87 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 const Modal = ({ isOpen, onClose, title, children }) => {
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "Tab" && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href]',
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+    window.setTimeout(() => closeButtonRef.current?.focus(), 0);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus?.();
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 py-8">
-        <div
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+
+  // A portal keeps the dialog outside animated/backdrop-filter containers.
+  // Otherwise position: fixed can be clipped to the active tab, leaving only
+  // an unclickable dark overlay visible over the quiz controls.
+  return createPortal(
+    <div className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto p-4 sm:p-8">
+      <button
+        type="button"
+        aria-label="Close dialog"
+        className="absolute inset-0 cursor-default bg-black/60"
+        onClick={onClose}
+      />
+
+      <section
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="relative z-10 w-full max-w-lg rounded-2xl border border-white/10 bg-[#111827] p-6 shadow-2xl shadow-black/50 sm:p-8"
+      >
+        <button
+          ref={closeButtonRef}
+          type="button"
           onClick={onClose}
-        ></div>
+          aria-label="Close"
+          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <X className="h-5 w-5" strokeWidth={2} />
+        </button>
 
-        <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-2xl shadow-slate-900/20 p-8 z-10 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <button
-            onClick={onClose}
-            className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200"
-          >
-            <X className="w-5 h-5" strokeWidth={2} />
-          </button>
-
-          <div className="mb-6 pr-8">
-            <h3 className="text-xl font-medium text-slate-900 tracking-tight">
-              {title}
-            </h3>
-          </div>
-
-          <div>{children}</div>
+        <div className="mb-6 pr-8">
+          <h3 className="text-xl font-semibold tracking-tight text-white">
+            {title}
+          </h3>
         </div>
-      </div>
-    </div>
+
+        <div>{children}</div>
+      </section>
+    </div>,
+    document.body,
   );
 };
 

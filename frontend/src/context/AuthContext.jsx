@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import authService from "../services/authService";
 
 const AuthContext = createContext();
 
@@ -16,44 +23,54 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const userStr = localStorage.getItem("user");
-
-      if (token && userStr) {
-        const userData = JSON.parse(userStr);
-        setUser(userData);
-        setIsAuthenticated(true);
-      }
-    } catch (error) {
-      console.error("Auth check failed:", error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = (userData, token) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-
-    setUser(userData);
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
+  const logout = useCallback(async () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
     setUser(null);
     setIsAuthenticated(false);
 
-    window.location.href = "/";
+    try {
+      await authService.logout();
+    } catch {
+      // Local state is still cleared if the server is temporarily unavailable.
+    } finally {
+      window.location.href = "/login";
+    }
+  }, []);
+
+  const checkAuthStatus = useCallback(async () => {
+    try {
+      const session = await authService.getSession();
+      const userData = session.user;
+
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
+
+  const login = (userData, token) => {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    setUser(userData);
+    setIsAuthenticated(true);
   };
 
   const updateUser = (updatedUserData) => {

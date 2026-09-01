@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
 import quizService from "../../services/quizService";
 import aiService from "../../services/aiService";
-import Spinner from "../common/Spinner";
 import Button from "../common/Button";
 import Modal from "../common/Modal";
 import EmptyState from "../common/EmptyState";
@@ -16,6 +15,7 @@ const QuizManager = ({ documentId }) => {
   const [generating, setGenerating] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [numQuestions, setNumQuestions] = useState(5);
+  const generateRequestInFlight = useRef(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -42,15 +42,37 @@ const QuizManager = ({ documentId }) => {
 
   const handleGenerateQuiz = async (e) => {
     e.preventDefault();
+
+    // A ref closes the small gap before React re-renders the disabled button,
+    // preventing a fast double-click from creating duplicate quizzes.
+    if (generateRequestInFlight.current) return;
+    generateRequestInFlight.current = true;
     setGenerating(true);
+
     try {
-      await aiService.generateQuiz(documentId, { numQuestions });
+      const response = await aiService.generateQuiz(documentId, {
+        numQuestions,
+      });
+      const generatedQuiz = response?.data;
+
+      if (!generatedQuiz?._id) {
+        throw new Error("The server did not return the generated quiz.");
+      }
+
+      // The POST response already contains the saved quiz. Insert it directly
+      // instead of replacing the whole quiz area with a spinner for another GET.
+      setQuizzes((currentQuizzes) => [
+        generatedQuiz,
+        ...currentQuizzes.filter((quiz) => quiz._id !== generatedQuiz._id),
+      ]);
       toast.success("Quiz generated successfully!");
       setIsGenerateModalOpen(false);
-      fetchQuizzes();
     } catch (error) {
-      toast.error(error.message || "Failed to generate quiz.");
+      toast.error(
+        error?.error || error?.message || "Failed to generate quiz.",
+      );
     } finally {
+      generateRequestInFlight.current = false;
       setGenerating(false);
     }
   };
@@ -78,8 +100,17 @@ const handleConfirmDelete = async () => {
 };
 
 const renderQuizContent = () => {
-  if (loading) {
-    return <Spinner />;
+  // Keep existing cards mounted during any later refresh so the page does not
+  // flash back to a blank loading state.
+  if (loading && quizzes.length === 0) {
+    return (
+      <div
+        role="status"
+        className="flex min-h-40 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-sm font-medium text-slate-400"
+      >
+        Loading quizzes...
+      </div>
+    );
   }
 
   if (quizzes.length === 0) {
@@ -101,7 +132,7 @@ return (
 };
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-lg p-6">
+    <div className="rounded-2xl border border-white/10 bg-[#111827]/85 p-6 shadow-2xl shadow-black/20">
       <div className="flex justify-end gap-2 mb-4">
         <Button onClick={() => setIsGenerateModalOpen(true)}>
           <Plus size={16} />
@@ -120,20 +151,21 @@ return (
 >
   <form onSubmit={handleGenerateQuiz} className="space-y-4">
     <div>
-      <label className="block text-xs font-medium text-neutral-700 mb-1.5">
+      <label className="block text-xs font-medium text-slate-300 mb-1.5">
         Number of Questions
       </label>
       <input
         type="number"
         value={numQuestions}
         onChange={(e) =>
-          setNumQuestions(Math.max(1, parseInt(e.target.value) || 1))
+          setNumQuestions(
+            Math.min(20, Math.max(1, parseInt(e.target.value, 10) || 1)),
+          )
         }
         min="1"
+        max="20"
         required
-        className="w-full h-9 px-3 border border-neutral-200 rounded-lg bg-white text-sm
-        text-neutral-900 placeholder-neutral-400 transition-colors duration-150 focus:outline-none
-        focus:ring-2 focus:ring-[#00d492] focus:border-transparent"
+        className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-slate-100 placeholder-slate-500 transition-colors duration-150 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-sky-500"
       />
     </div>
 
@@ -161,12 +193,12 @@ return (
         title="Confirm Delete Quiz?"
       >
         <div className="space-y-4">
-          <p className="text-sm text-neutral-600">
-            Are you sure you want to delete this quiz?: 
-            <span className="font-semibold text-neutral-900">
+          <p className="text-sm text-slate-400">
+            Are you sure you want to delete this quiz:{" "}
+            <span className="font-semibold text-white">
               {selectedQuiz?.title || 'this quiz'}
-            </span>? This action cannot be undone.
-            undone.
+            </span>
+            ? This action cannot be undone.
           </p>
 
           <div className="flex justify-end gap-2 pt-2">

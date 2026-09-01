@@ -23,22 +23,19 @@ const FlashcardSetCard = ({ flashcardSet }) => {
 
   return (
     <div
-      className="group relative bg-white/80 backdrop-blur-xl border-2 border-slate-200 
-      hover:border-emerald-300 rounded-2xl p-6 cursor-pointer transition-all duration-200 
-       hover:shadow-lg hover:shadow-emerald-500/10 flex flex-col justify-between"
+      className="group relative flex cursor-pointer flex-col justify-between rounded-2xl border border-white/10 bg-[#111827]/85 p-6 shadow-xl shadow-black/20 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-400/35 hover:shadow-sky-500/10"
       onClick={handleStudyNow}
     >
       <div className="space-y-4">
         {/* Icon and Title */}
         <div className="flex items-start gap-4">
-          <div className="shrink-0 w-12 h-12 rounded-xl bg-linear-to-br from-emerald-100
-          to-teal-100 flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-emerald-600" strokeWidth={2} />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-sky-400/20 bg-sky-500/10">
+            <BookOpen className="h-6 w-6 text-sky-300" strokeWidth={2} />
           </div>
 
           <div className="flex-1 min-w-0">
             <h3
-              className="text-base font-semibold text-slate-900 line-clamp-2 mb-1"
+              className="text-base font-semibold text-white line-clamp-2 mb-1"
               title={flashcardSet?.documentId?.title}
             >
               {flashcardSet?.documentId?.title}
@@ -52,16 +49,16 @@ const FlashcardSetCard = ({ flashcardSet }) => {
 
         {/* Stats */}
         <div className="flex items-center gap-3 pt-2">
-          <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">
-            <span className="text-sm font-semibold text-slate-700">
+          <div className="px-3 py-1.5 bg-white/[0.04] border border-white/10 rounded-lg">
+            <span className="text-sm font-semibold text-slate-300">
               {totalCards} {totalCards === 1 ? "Card" : "Cards"}
             </span>
           </div>
 
           {reviewedCount > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" strokeWidth={2.5} />
-              <span className="text-sm font-semibold text-emerald-700">
+            <div className="flex items-center gap-1.5 rounded-lg border border-sky-400/20 bg-sky-500/10 px-3 py-1.5">
+              <TrendingUp className="h-3.5 w-3.5 text-sky-300" strokeWidth={2.5} />
+              <span className="text-sm font-semibold text-sky-200">
                 {progressPercentage}%
               </span>
             </div>
@@ -72,16 +69,16 @@ const FlashcardSetCard = ({ flashcardSet }) => {
         {totalCards > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-600">Progress</span>
-              <span className="text-xs font-semibold text-slate-700">
+              <span className="text-xs font-medium text-slate-400">Progress</span>
+              <span className="text-xs font-semibold text-slate-300">
                 {reviewedCount}/{totalCards} reviewed
               </span>
             </div>
 
-            <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-white/[0.06] rounded-full overflow-hidden">
               <div
-                className="absolute inset-y-0 left-0 bg-linear-to-r from-emerald-500
-                to-teal-500 rounded-full transition-all duration-500 ease-out"
+                className="absolute inset-y-0 left-0 bg-linear-to-r from-sky-500
+                to-sky-500 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -90,15 +87,15 @@ const FlashcardSetCard = ({ flashcardSet }) => {
    </div>
 
         {/* Study Button */}
-        <div className="mt-6 pt-4 border-t border-slate-100">
+        <div className="mt-6 border-t border-white/10 pt-4">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleStudyNow();
             }}
-            className="group/btn relative w-full h-11 bg-linear-to-r from-emerald-50 to-teal-100
-            hover:from-emerald-600 hover:to-teal-600 text-emerald-700 hover:text-white font-semibold text-sm rounded-xl
-            transition-all duration-200 active:scale-95 overflow-hidden"
+            className="group/btn relative h-11 w-full overflow-hidden rounded-xl border border-sky-400/20 bg-sky-500/10 text-sm font-semibold text-sky-200
+            transition-all duration-200 hover:border-sky-400/40 hover:bg-sky-500 hover:text-white
+            active:scale-95"
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
               <Sparkles className="w-4 h-4" strokeWidth={2.5} />

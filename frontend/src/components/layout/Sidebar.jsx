@@ -1,133 +1,117 @@
-import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard,
+  BookOpen,
+  BrainCircuit,
   FileText,
   Info,
-  User,
+  LayoutDashboard,
   LogOut,
-  BrainCircuit,
-  BookOpen,
-  X,
+  Menu,
+  MessageSquareHeart,
+  Sparkles,
+  User,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+
+const navLinks = [
+  { to: "/dashboard", icon: LayoutDashboard, text: "Dashboard" },
+  { to: "/documents", icon: FileText, text: "Documents" },
+  { to: "/flashcards", icon: BookOpen, text: "Flashcards" },
+  { to: "/about", icon: Info, text: "About" },
+  { to: "/feedback", icon: MessageSquareHeart, text: "Feedback" },
+];
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const { logout, user } = useAuth();
 
   const handleNavClick = () => {
-    if (window.innerWidth < 768) {
-      toggleSidebar();
-    }
+    if (window.innerWidth < 768) toggleSidebar();
   };
-
-  const navLinks = [
-    { to: "/dashboard", icon: LayoutDashboard, text: "Dashboard" },
-    { to: "/documents", icon: FileText, text: "Documents" },
-    { to: "/flashcards", icon: BookOpen, text: "Flashcards" },
-    { to: "/about", icon: Info, text: "About" },
-    { to: "/profile", icon: User, text: "Profile" },
-  ];
 
   return (
     <>
-      {/* Overlay */}
-      <div
-        className={`fixed inset-0 bg-black/30 z-40 md:hidden transition-opacity duration-200 ${
-          isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+      <button
+        type="button"
+        aria-label="Close navigation"
+        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-200 md:hidden ${isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
         onClick={toggleSidebar}
-        aria-hidden="true"
-      ></div>
+      />
 
-      {/* Sidebar */}
       <aside
         id="app-sidebar"
         aria-label="Primary navigation"
-        className={`fixed top-0 left-0 h-full w-64 overflow-hidden bg-white/90 backdrop-blur-lg border-r border-slate-200/60 z-50 transition-all duration-300 dark:bg-slate-900/95 dark:border-slate-800
-          md:relative md:shrink-0 md:flex md:flex-col ease-in-out ${
-            isSidebarOpen
-              ? "translate-x-0 md:w-64"
-              : "-translate-x-full md:w-0 md:translate-x-0 md:border-r-0"
-          }`}
+        className={`fixed left-0 top-0 z-50 flex h-full w-[268px] flex-col overflow-hidden border-r border-white/10 bg-[#111112] text-white shadow-2xl shadow-black/30 transition-all duration-300 ease-out md:sticky md:top-3 md:h-[calc(100vh-1.5rem)] md:shrink-0 md:rounded-[24px] md:border ${
+          isSidebarOpen
+            ? "translate-x-0 md:w-[268px] md:opacity-100"
+            : "-translate-x-full md:w-0 md:translate-x-0 md:border-0 md:opacity-0"
+        }`}
       >
-        {/* Logo and Close button for mobile */}
-        <div className="flex items-center justify-between h-16 px-5 border-b border-slate-200/60 dark:border-slate-800">
-          <div className="flex items-center gap-3">
-            <div
-              className="flex items center justify-center w-9 h-9 rounded-xl 
-            bg-linear-to-br from-emerald-400 to-teal-500 shadow-md shadow-emerald-500/20"
-            >
-              <BrainCircuit
-                className="text-white"
-                size={20}
-                strokeWidth={2.5}
-              />
+        <div className="relative border-b border-white/10 px-5 py-5">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-orange-500/15 to-transparent" />
+          <div className="relative flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/25">
+                <BrainCircuit size={21} strokeWidth={2.5} />
+              </div>
+              <div className="min-w-0">
+                <h1 className="truncate text-base font-extrabold tracking-[-0.02em] text-white">LearnQuick</h1>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone-500">AI learning studio</p>
+              </div>
             </div>
-            <h1 className="text-sm md:text-base font-bold text-slate-900 tracking-tight dark:text-slate-100">
-              LearnQuick
-            </h1>
+            <button type="button" onClick={toggleSidebar} className="flex h-10 w-10 items-center justify-center rounded-xl text-stone-400 hover:bg-white/5 hover:text-white md:hidden" aria-label="Close sidebar">
+              <Menu size={21} />
+            </button>
           </div>
 
-          <button
-            onClick={toggleSidebar}
-            className="md:hidden text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
-            aria-label="Close sidebar"
-          >
-            <X size={24} />
-          </button>
+          <div className="relative mt-5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+            <div className="mb-2 flex items-center gap-2 text-orange-300">
+              <Sparkles size={15} strokeWidth={2.5} />
+              <span className="text-xs font-bold uppercase tracking-[0.14em]">AI workspace</span>
+            </div>
+            <p className="text-sm font-semibold text-white">Learn from what matters.</p>
+            <p className="mt-1 text-xs leading-5 text-stone-400">Documents become explanations, recall, and practice.</p>
+          </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-1.5">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
+          <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-600">Workspace</p>
           {navLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
               onClick={handleNavClick}
               className={({ isActive }) =>
-                `group flex items-center gap-3 px-4 py-2.5 text-sm font-semibold rounded-xl ${
+                `group relative flex min-h-12 items-center gap-3 overflow-hidden rounded-xl px-3 text-sm font-semibold transition-all duration-200 ${
                   isActive
-                    ? "bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow"
-                    : "text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                    ? "bg-orange-500 text-white shadow-lg shadow-orange-500/15"
+                    : "text-stone-400 hover:bg-white/[0.06] hover:text-white"
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <link.icon
-                    size={18}
-                    strokeWidth={2.5}
-                    className={`transition-transform duration-200 ${
-                      isActive ? "" : "group-hover:scale-110"
-                    }`}
-                  />
-                  {link.text}
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isActive ? "bg-black/15 text-white" : "bg-white/[0.04] text-stone-500 group-hover:text-orange-300"}`}>
+                    <link.icon size={18} strokeWidth={2.3} />
+                  </span>
+                  <span>{link.text}</span>
                 </>
               )}
             </NavLink>
           ))}
         </nav>
 
-        {/* Logout Section */}
-        <div className="px-3 py-4 border-t border-slate-200/60 dark:border-slate-800">
-          <button
-            onClick={handleLogout}
-            className="group flex items-center gap-3 w-full px-4 py-2.5
-          text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all duration-200 dark:text-slate-300 dark:hover:bg-red-500/10 dark:hover:text-red-300"
-          >
-            <LogOut
-              size={18}
-              strokeWidth={2.5}
-              className="transition-transform duration-200 group-hover:scale-110"
-            />
-            Logout
+        <div className="border-t border-white/10 p-3">
+          <div className="mb-2 flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-300">
+              <User size={17} strokeWidth={2.4} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-white">{user?.username || "Learner"}</p>
+              <p className="truncate text-xs text-stone-500">{user?.email || "Your account"}</p>
+            </div>
+          </div>
+          <button type="button" onClick={logout} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-semibold text-stone-400 transition-colors hover:bg-red-500/10 hover:text-red-300">
+            <LogOut size={18} strokeWidth={2.4} /> Logout
           </button>
         </div>
       </aside>

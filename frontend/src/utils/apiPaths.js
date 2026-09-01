@@ -1,4 +1,11 @@
-export const BASE_URL = "http://localhost:8000";
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+
+// Use the deployment-specific URL when provided and keep localhost as a safe
+// development fallback. Removing trailing slashes prevents URLs such as //api.
+export const BASE_URL = (configuredApiUrl || "http://localhost:8000").replace(
+  /\/+$/,
+  "",
+);
 
 export const API_PATHS = {
   AUTH: {
@@ -7,6 +14,11 @@ export const API_PATHS = {
     GET_PROFILE: "/api/auth/profile",
     UPDATE_PROFILE: "/api/auth/profile",
     CHANGE_PASSWORD: "/api/auth/change-password",
+    GET_PROVIDERS: "/api/auth/providers",
+    GET_SESSION: "/api/auth/session",
+    LOGOUT: "/api/auth/logout",
+    FORGOT_PASSWORD: "/api/auth/forgot-password",
+    RESET_PASSWORD: (token) => `/api/auth/reset-password/${token}`,
   },
 
   DOCUMENTS: {
@@ -44,5 +56,10 @@ export const API_PATHS = {
 
   PROGRESS: {
     GET_DASHBOARD: "/api/progress/dashboard",
+  },
+
+  FEEDBACK: {
+    SUBMIT: "/api/feedback",
+    GET_MINE: "/api/feedback/me",
   },
 };

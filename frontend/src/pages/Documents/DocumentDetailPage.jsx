@@ -1,6 +1,6 @@
 // Shows one uploaded document, its study tools, AI chat, flashcards, and quizzes.
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import documentService from "../../services/documentService";
 import Spinner from "../../components/common/Spinner";
 import PageHeader from "../../components/common/PageHeader";
@@ -14,10 +14,20 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("Content");
+  const requestedTab = searchParams.get("tab");
+  const availableTabs = ["Content", "Chat", "AI Actions", "Flashcards", "Quizzes"];
+  const [activeTab, setActiveTab] = useState(
+    availableTabs.includes(requestedTab) ? requestedTab : "Content",
+  );
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSearchParams(tab === "Content" ? {} : { tab }, { replace: true });
+  };
 
   useEffect(() => {
     const fetchDocumentDetails = async () => {
@@ -65,9 +75,9 @@ const DocumentDetailPage = () => {
     const pdfUrl = getPdfUrl();
 
     return (
-      <div className="bg-white border border-gray-300 rounded-lg overflow-hidden shadow-md">
-        <div className="flex items-center justify-between p-4 bg-gray-50 border-b border-gray-300">
-          <span className="text-sm font-medium text-gray-700">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#111827]/85 shadow-2xl shadow-black/20">
+        <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] p-4">
+          <span className="text-sm font-medium text-slate-300">
             Document Viewer
           </span>
 
@@ -75,7 +85,7 @@ const DocumentDetailPage = () => {
             href={pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700
+            className="inline-flex items-center gap-1.5 text-sm text-sky-300 hover:text-sky-200
             font-medium transition-colors"
           >
             <ExternalLink size={16} />
@@ -83,10 +93,10 @@ const DocumentDetailPage = () => {
           </a>
         </div>
 
-        <div className="bg-gray-100 p-1">
+        <div className="bg-[#0B0F19] p-1">
           <iframe
             src={pdfUrl}
-            className="w-full h-[70vh] bg-white rounded border border-gray-300"
+            className="h-[70vh] w-full rounded border border-white/10 bg-white"
             title="PDF Viewer"
             frameBorder="0"
             style={{
@@ -147,15 +157,19 @@ const DocumentDetailPage = () => {
       <div className="mb-4">
         <Link
           to="/documents"
-          className="inline-flex items-center gap-2 text-sm text-nautral-600 hover:text-neutral-800 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-sky-300"
         >
           <ArrowLeft size={16} />
           Back to Documents
         </Link>
       </div>
 
-      <PageHeader title={document.data.title} />
-      <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <PageHeader
+        eyebrow="Document workspace"
+        title={document.data.title}
+        subtitle={`${document.data.flashcardCount || 0} flashcard set${document.data.flashcardCount === 1 ? "" : "s"} · ${document.data.quizCount || 0} quiz${document.data.quizCount === 1 ? "" : "zes"}`}
+      />
+      <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={handleTabChange} />
     </div>
   );
 };

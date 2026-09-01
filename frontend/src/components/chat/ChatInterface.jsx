@@ -86,7 +86,7 @@ return (
     className={`flex items-start gap-3 mb-4 ${isUser ? "justify-end" : ""}`}
   >
     {!isUser && (
-      <div className="w-9 h-9 rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 flex items-center justify-center shrink-0">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-500 shadow-lg shadow-sky-500/30">
         <Sparkles className="w-4 h-4 text-white" strokeWidth={2} />
       </div>
     )}
@@ -94,8 +94,8 @@ return (
     <div
       className={`max-w-lg p-4 rounded-2xl shadow-sm ${
         isUser
-          ? "bg-linear-to-br from-emerald-500 to-teal-500 text-white rounded-br-md"
-          : "bg-white border border-slate-200/60 text-slate-800 rounded-bl-md"
+          ? "bg-sky-500 text-white rounded-br-md shadow-sky-500/20"
+          : "bg-white/[0.04] border border-white/10 text-slate-300 rounded-bl-md"
       }`}
     >
       {isUser ? (
@@ -108,8 +108,7 @@ return (
     </div>
 
     {isUser && (
-      <div className="w-9 h-9 rounded-xl bg-linear-to-br from-slate-200 to-slate-300 flex items-center justify-center 
-      text-slate-700 font-semibold text-sm shrink-0 ">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] text-sm font-semibold text-slate-200">
         {(msg?.content?.trim?.()?.charAt(0) || "U").toUpperCase()}
       </div>
     )}
@@ -119,12 +118,12 @@ return (
 
   if (initialLoading) {
     return (
-      <div className="flex flex-col h-[70vh] bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl items-center justify-center shadow-xl shadow-slate-200/50">
-        <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4">
-          <MessageSquare className="w-7 h-7 text-emerald-600" strokeWidth={2} />
+      <div className="flex h-[70vh] flex-col items-center justify-center rounded-2xl border border-white/10 bg-[#111827]/85 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-500/10">
+          <MessageSquare className="h-7 w-7 text-sky-300" strokeWidth={2} />
         </div>
         <Spinner />
-        <p className="text-sm text-slate-500 mt-3 font-medium">
+        <p className="mt-3 text-sm font-medium text-slate-400">
           Loading chat history...
         </p>
       </div>
@@ -132,18 +131,18 @@ return (
   }
 
   return (
-    <div className="flex flex-col h-[70vh] bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl p-6 shadow-xl shadow-slate-200/50 overflow-hidden">
+    <div className="flex h-[70vh] flex-col overflow-hidden rounded-2xl border border-sky-400/20 bg-[#111827]/85 p-4 shadow-2xl shadow-sky-500/10 backdrop-blur-xl sm:p-6">
       {/* Messages Area */}
-      <div className="flex-1 p-6 overflow-y-auto bg-linear-to-br from-slate-50/50 via-white/50 to-slate-50/50">
+      <div className="flex-1 overflow-y-auto rounded-xl border border-white/10 bg-[#0B0F19]/70 p-4 sm:p-6">
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/10">
-              <MessageSquare className="w-8 h-8 text-emerald-600" strokeWidth={2} />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-500/10 shadow-lg shadow-sky-500/10">
+              <MessageSquare className="h-8 w-8 text-sky-300" strokeWidth={2} />
             </div>
-            <h3 className="text-base font-semibold text-slate-900 mb-2">
+            <h3 className="mb-2 text-base font-semibold text-white">
               Start a conversation
             </h3>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               Ask me anything about the document!
             </p>
           </div>
@@ -155,15 +154,15 @@ return (
 
         {loading && (
           <div className="flex items-center gap-3 my-4">
-            <div className="w-9 h-9 rounded-xl bg-linear-to-br from-emerald-400 to-teal-500 shadow-emerald-500/25 flex items-center justify-center shrink-0">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-500 shadow-sky-500/25">
               <Sparkles className="w-4 h-4 text-white" strokeWidth={2} />
             </div>
 
-            <div className="flex items-center gap-2 px-4 py-3 rounded-2xl rounded-bl-md bg-white border border-slate-200/60">
+            <div className="flex items-center gap-2 rounded-2xl rounded-bl-md border border-white/10 bg-white/[0.04] px-4 py-3">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                <span className="h-2 w-2 animate-bounce rounded-full bg-sky-300" style={{ animationDelay: "0ms" }}></span>
+                <span className="h-2 w-2 animate-bounce rounded-full bg-sky-300" style={{ animationDelay: "150ms" }}></span>
+                <span className="h-2 w-2 animate-bounce rounded-full bg-sky-300" style={{ animationDelay: "300ms" }}></span>
               </div>
             </div>
           </div>
@@ -171,21 +170,21 @@ return (
       </div>
 
       {/* Input Area */}
-      <div className="p-5 border-t border-slate-200/60 bg-white/80">
+      <div className="border-t border-white/10 bg-[#111827]/80 p-4 sm:p-5">
         <form onSubmit={handleSendMessage} className="flex items-center gap-3">
           <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Ask a follow-up question..."
-            className="flex-1 h-12 px-4 border-2 border-slate-200/60 rounded-xl bg-slate-50/50 text-slate-900 placeholder-slate-400 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:shadow-emerald-500/10"
+            className="h-12 flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-medium text-slate-100 placeholder-slate-500 transition-all duration-200 focus:border-sky-400 focus:bg-white/[0.06] focus:outline-none focus:shadow-lg focus:shadow-sky-500/10"
             disabled={loading}
           />
 
           <button
             type="submit"
             disabled={loading || !message.trim()}
-            className="shrink-0 w-12 h-12 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-500 text-white shadow-lg shadow-sky-500/25 transition-all duration-200 hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 active:scale-95"
           >
             <Send className="w-5 h-5" strokeWidth={2} />
           </button>

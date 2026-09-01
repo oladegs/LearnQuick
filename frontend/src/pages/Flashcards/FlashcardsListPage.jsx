@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import flashcardService from '../../services/flashcardService';
 import PageHeader from '../../components/common/PageHeader';
-import Spinner from '../../components/common/Spinner';
+import { CardGridSkeleton } from '../../components/common/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import FlashcardSetCard from '../../components/flashcards/FlashcardSetCard';
 import toast from 'react-hot-toast';
@@ -15,8 +15,6 @@ const FlashcardsListPage = () => {
     const fetchFlashcardSets = async () => {
       try {
         const response = await flashcardService.getAllFlashcardSets();
-
-        console.log("fetchFlashcardSets__", response.data);
 
         setFlashcardSets(response.data);
       } catch (error) {
@@ -32,14 +30,14 @@ const FlashcardsListPage = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <Spinner />;
+      return <CardGridSkeleton count={4} />;
     }
 
     if (flashcardSets.length === 0) {
       return (
         <EmptyState
-          title="No Flashcard Sets Found"
-          description="You haven't generated any flashcards yet. Go to a document to create your first set."
+          title="No flashcard sets yet."
+          description="Generate flashcards from one of your documents to begin an active-recall session."
         />
       );
     }
@@ -55,7 +53,7 @@ const FlashcardsListPage = () => {
 
   return (
     <div>
-      <PageHeader title="All Flashcard Sets" />
+      <PageHeader eyebrow="Active recall" title="Flashcard sets" subtitle="Review generated cards, track study progress, and return to the ideas that need more attention." />
       {renderContent()}
     </div>
   );

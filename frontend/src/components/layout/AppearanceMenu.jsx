@@ -10,12 +10,12 @@ const themeOptions = [
 ];
 
 const getInitialTheme = () => {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "dark";
 
   const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
   return ["light", "dark", "system"].includes(storedTheme)
     ? storedTheme
-    : "system";
+    : "dark";
 };
 
 const applyTheme = (theme) => {
@@ -82,25 +82,17 @@ const AppearanceMenu = () => {
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200/70 bg-white/70 px-3 text-sm font-semibold text-slate-700 transition-all duration-200 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700/70 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 transition-all duration-200 hover:border-sky-400/40 hover:bg-sky-500/10 hover:text-white dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:bg-sky-500/10"
         aria-label="Change appearance"
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
         <ActiveIcon size={18} strokeWidth={2.4} />
-        <span className="hidden sm:inline">Appearance</span>
-        <ChevronDown
-          size={16}
-          strokeWidth={2.4}
-          className={`transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
       </button>
 
       {isOpen && (
         <div
-          className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-lg border border-slate-200/70 bg-white py-2 shadow-xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-800 dark:shadow-black/30"
+          className="absolute right-0 top-12 z-50 w-56 overflow-hidden rounded-xl border border-white/10 bg-[#111827]/95 py-2 shadow-2xl shadow-black/40 backdrop-blur-xl"
           role="menu"
         >
           {themeOptions.map((option) => {
@@ -112,21 +104,21 @@ const AppearanceMenu = () => {
                 key={option.value}
                 type="button"
                 onClick={() => handleThemeSelect(option.value)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-700/80 dark:hover:text-white"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-300 transition-colors duration-150 hover:bg-sky-500/10 hover:text-white"
                 role="menuitemradio"
                 aria-checked={isSelected}
               >
                 <OptionIcon
                   size={20}
                   strokeWidth={2.5}
-                  className="shrink-0 text-slate-500 dark:text-slate-300"
+                  className="shrink-0 text-slate-400"
                 />
                 <span className="flex-1">{option.label}</span>
                 {isSelected && (
                   <Check
                     size={16}
                     strokeWidth={2.5}
-                    className="text-emerald-500"
+                    className="text-sky-400"
                   />
                 )}
               </button>

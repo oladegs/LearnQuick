@@ -1,205 +1,155 @@
-// Shows a dashboard summary of documents, flashcards, quizzes, and recent study activity.
-import React, { useState, useEffect } from "react";
-import Spinner from "../../components/common/Spinner";
-import progressService from "../../services/progressService";
-import toast from "react-hot-toast";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
-  FileText,
+  ArrowRight,
   BookOpen,
   BrainCircuit,
-  TrendingUp,
-  Clock,
+  Clock3,
+  FilePlus2,
+  FileText,
+  MessageSquareText,
+  RefreshCw,
+  Sparkles,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import progressService from "../../services/progressService";
+import Button from "../../components/common/Button";
+import Skeleton from "../../components/common/Skeleton";
+import StatCard from "../../components/common/StatCard";
 
 const DashboardPage = () => {
+  const { user } = useAuth();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const data = await progressService.getDashboardData();
-        console.log("Data__getDashboardData", data);
-
-        setDashboardData(data.data);
-      } catch (error) {
-        toast.error("Failed to fetch dashboard data.");
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
+  const fetchDashboardData = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await progressService.getDashboardData();
+      setDashboardData(data.data);
+    } catch (requestError) {
+      setError(requestError.message || "We couldn't load your learning overview.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  if (loading) {
-    return <Spinner />;
-  }
+  useEffect(() => { fetchDashboardData(); }, [fetchDashboardData]);
 
-  if (!dashboardData || !dashboardData.overview) {
+  const recentActivities = useMemo(() => [
+    ...(dashboardData?.recentActivity?.documents || []).map((doc) => ({
+      id: doc._id,
+      title: doc.title,
+      label: "Opened document",
+      timestamp: doc.lastAccessed,
+      link: `/documents/${doc._id}`,
+      icon: FileText,
+    })),
+    ...(dashboardData?.recentActivity?.quizzes || []).map((quiz) => ({
+      id: quiz._id,
+      title: quiz.title,
+      label: quiz.completedAt ? "Completed quiz" : "Created quiz",
+      timestamp: quiz.completedAt || quiz.createdAt,
+      link: `/quizzes/${quiz._id}`,
+      icon: BrainCircuit,
+    })),
+  ].filter((activity) => activity.timestamp).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 6), [dashboardData]);
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-            <TrendingUp className="w-8 h-8 text-slate-400" />
-          </div>
-          <p className="text-slate-600 text-sm">No dashboard data available.</p>
-        </div>
+      <div role="status" aria-label="Loading dashboard" className="space-y-6">
+        <Skeleton className="h-56 w-full rounded-[24px]" />
+        <div className="grid gap-4 md:grid-cols-3">{[0, 1, 2].map((item) => <Skeleton key={item} className="h-36" />)}</div>
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"><Skeleton className="h-80" /><Skeleton className="h-80" /></div>
+        <span className="sr-only">Loading your learning workspace...</span>
       </div>
     );
   }
 
+  if (error || !dashboardData?.overview) {
+    return (
+      <section className="surface-card mx-auto flex min-h-80 max-w-xl flex-col items-center justify-center rounded-[22px] p-8 text-center">
+        <RefreshCw className="mb-5 h-10 w-10 text-orange-500" />
+        <h1 className="text-xl font-bold text-stone-950 dark:text-white">We couldn&apos;t load your dashboard.</h1>
+        <p className="mt-2 text-sm text-stone-600 dark:text-stone-400">{error || "Please try again in a moment."}</p>
+        <Button onClick={fetchDashboardData} className="mt-6">Try again</Button>
+      </section>
+    );
+  }
+
+  const { overview, recentActivity } = dashboardData;
+  const latestDocument = recentActivity?.documents?.[0];
+  const firstName = user?.username?.split(/[\s_-]/)[0] || "Learner";
   const stats = [
-    {
-      label: "Total Documents",
-      value: dashboardData.overview.totalDocuments,
-      icon: FileText,
-      gradient: "from-blue-400 to-cyan-500",
-      shadowColor: "shadow-blue-500/25",
-    },
-    {
-      label: "Total Flashcards",
-      value: dashboardData.overview.totalFlashcards,
-      icon: BookOpen,
-      gradient: "from-purple-400 to-pink-500",
-      shadowColor: "shadow-purple-500/25",
-    },
-    {
-      label: "Total Quizzes",
-      value: dashboardData.overview.totalQuizzes,
-      icon: BrainCircuit,
-      gradient: "from-emerald-400 to-teal-500",
-      shadowColor: "shadow-emerald-500/25",
-    },
+    { label: "Documents", value: overview.totalDocuments, detail: "Sources in your library", icon: FileText },
+    { label: "Flashcards", value: overview.totalFlashcards, detail: `${overview.reviewedFlashcards || 0} reviewed`, icon: BookOpen },
+    { label: "Quizzes", value: overview.totalQuizzes, detail: `${overview.completedQuizzes || 0} completed`, icon: BrainCircuit },
   ];
 
-  const recentActivities = [
-    ...(dashboardData.recentActivity?.documents || []).map((doc) => ({
-      id: doc._id,
-      description: doc.title,
-      timestamp: doc.lastAccessed,
-      link: `/documents/${doc._id}`,
-      type: "document",
-    })),
-    ...(dashboardData.recentActivity?.quizzes || []).map((quiz) => ({
-      id: quiz._id,
-      description: quiz.title,
-      timestamp: quiz.lastAttempted,
-      link: `/quizzes/${quiz._id}`,
-      type: "quiz",
-    })),
-  ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
   return (
-    <div className="min-h-screen">
-      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] opacity-30 pointer-events-none" />
-
-      <div className="relative max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-medium text-slate-900 tracking-tight mb-2">
-            Dashboard
-          </h1>
-
-          <p className="text-slate-500 text-sm">
-            Track your learning progress and activity
-          </p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="group relative bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/50 p-6 hover:shadow-2xl hover:shadow-slate-300/50 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  {stat.label}
-                </span>
-                <div
-                  className={`w-11 h-11 rounded-xl bg-linear-to-br ${stat.gradient} shadow-lg ${stat.shadowColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
-                >
-                  <stat.icon className="w-5 h-5 text-white" strokeWidth={2} />
-                </div>
-              </div>
-              <div className="text-3xl font-semibold text-slate-900 tracking-tight">
-                {stat.value}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Recent Activity Section */}
-        <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/50 p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-slate-600" strokeWidth={2} />
-            </div>
-
-            <h3 className="text-xl font-medium text-slate-900 tracking-tight">
-              Recent Activity
-            </h3>
+    <div className="space-y-6">
+      <section className="relative overflow-hidden rounded-[24px] bg-[#171717] p-7 text-white shadow-2xl shadow-stone-950/15 sm:p-9 lg:p-10">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_18%,rgba(249,115,22,0.38),transparent_22rem),linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-size-[auto,32px_32px,32px_32px]" />
+        <div className="relative max-w-3xl">
+          <p className="eyebrow mb-3">Your learning command center</p>
+          <h1 className="text-3xl font-extrabold tracking-[-0.045em] sm:text-4xl lg:text-5xl">Welcome back, {firstName}.</h1>
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-stone-400 sm:text-base">Pick up where you left off, or turn a new document into explanations, flashcards, and quizzes.</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link to="/documents?upload=1" className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition-all hover:-translate-y-0.5 hover:bg-orange-600"><FilePlus2 size={17} />Upload a document</Link>
+            {latestDocument && <Link to={`/documents/${latestDocument._id}`} className="inline-flex h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-5 text-sm font-bold text-white transition-colors hover:bg-white/10">Continue learning<ArrowRight size={16} /></Link>}
           </div>
+        </div>
+      </section>
 
-          {dashboardData.recentActivity &&
-          (dashboardData.recentActivity.documents.length > 0 ||
-            dashboardData.recentActivity.quizzes.length > 0) ? (
-            <div className="space-y-3">
-              {recentActivities.map((activity, index) => (
-                <div
-                  key={activity.id || index}
-                  className="group flex items-center justify-between p-4 rounded-xl bg-slate-50/50 border border-slate-200/60 hover:bg-white hover:border-slate-300/60 hover:shadow-md transition-all duration-200"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div
-                        className={`w-2 h-2 rounded-full ${
-                          activity.type === "document"
-                            ? "bg-linear-to-r from-blue-400 to-cyan-500"
-                            : "bg-linear-to-r from-emerald-400 to-teal-500"
-                        }`}
-                      ></div>
+      <section aria-label="Learning statistics" className="grid gap-4 md:grid-cols-3">
+        {stats.map((stat) => <StatCard key={stat.label} {...stat} />)}
+      </section>
 
-                      <p className="text-sm font-medium text-slate-900 truncate">
-                        {activity.type === "document"
-                          ? "Accessed Document: "
-                          : "Attempted Quiz: "}
-                        <span className="text-slate-700">
-                          {activity.description}
-                        </span>
-                      </p>
-                    </div>
-
-                    <p className="text-xs text-slate-500 pl-4">
-                      {new Date(activity.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-
-                  {activity.link && (
-                    <a
-                      href={activity.link}
-                      className="ml-4 px-4 py-2 text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-all duration-200 whitespace-nowrap"
-                    >
-                      View
-                    </a>
-                  )}
-                </div>
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <section className="surface-card rounded-[20px] p-5 sm:p-7">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div><p className="eyebrow mb-2">Your momentum</p><h2 className="text-xl font-extrabold text-stone-950 dark:text-white">Recent activity</h2></div>
+            <Clock3 className="h-5 w-5 text-orange-500" />
+          </div>
+          {recentActivities.length ? (
+            <div className="divide-y divide-stone-200 dark:divide-white/10">
+              {recentActivities.map((activity) => (
+                <Link key={`${activity.label}-${activity.id}`} to={activity.link} className="group flex min-h-16 items-center gap-4 py-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-300"><activity.icon size={18} /></span>
+                  <span className="min-w-0 flex-1"><span className="block text-xs font-semibold text-stone-500">{activity.label}</span><span className="block truncate text-sm font-bold text-stone-900 group-hover:text-orange-700 dark:text-stone-100 dark:group-hover:text-orange-300">{activity.title}</span></span>
+                  <span className="hidden text-xs text-stone-500 sm:block">{new Date(activity.timestamp).toLocaleDateString()}</span>
+                  <ArrowRight size={16} className="text-stone-400 transition-transform group-hover:translate-x-1 group-hover:text-orange-500" />
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 mb-4">
-                <Clock className="w-8 h-8 text-slate-400" strokeWidth={2} />
-              </div>
-              <p className="text-sm text-slate-600">No recent activity yet.</p>
-              <p className="text-xs text-slate-500 mt-1">
-                Start learning to see your progress here.
-              </p>
+            <div className="rounded-2xl border border-dashed border-stone-300 p-8 text-center dark:border-white/10">
+              <p className="font-bold text-stone-900 dark:text-white">Nothing here yet.</p>
+              <p className="mt-1 text-sm text-stone-500">Start studying and your recent activity will appear here.</p>
             </div>
           )}
-        </div>
+        </section>
+
+        <section className="surface-card rounded-[20px] p-5 sm:p-7">
+          <p className="eyebrow mb-2">Move quickly</p>
+          <h2 className="text-xl font-extrabold text-stone-950 dark:text-white">Quick actions</h2>
+          <div className="mt-5 space-y-3">
+            {[
+              { icon: FilePlus2, label: "Upload document", detail: "Add new study material", to: "/documents?upload=1" },
+              { icon: BookOpen, label: "Generate flashcards", detail: latestDocument ? `From ${latestDocument.title}` : "Choose a document first", to: latestDocument ? `/documents/${latestDocument._id}?tab=Flashcards` : "/documents" },
+              { icon: BrainCircuit, label: "Create a quiz", detail: "Test your understanding", to: latestDocument ? `/documents/${latestDocument._id}?tab=Quizzes` : "/documents" },
+              { icon: MessageSquareText, label: "Ask AI", detail: "Explore your latest source", to: latestDocument ? `/documents/${latestDocument._id}?tab=Chat` : "/documents" },
+            ].map((action) => (
+              <Link key={action.label} to={action.to} className="group flex min-h-15 items-center gap-3 rounded-xl border border-stone-200 p-3 transition-all hover:border-orange-300 hover:bg-orange-50 dark:border-white/10 dark:hover:bg-orange-500/10">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-700 group-hover:bg-orange-500 group-hover:text-white dark:bg-white/[0.05] dark:text-stone-300"><action.icon size={17} /></span>
+                <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-stone-900 dark:text-white">{action.label}</span><span className="block truncate text-xs text-stone-500">{action.detail}</span></span>
+                <Sparkles size={15} className="text-orange-500 opacity-0 transition-opacity group-hover:opacity-100" />
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

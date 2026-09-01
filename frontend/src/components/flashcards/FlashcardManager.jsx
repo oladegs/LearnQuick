@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Plus,
   ChevronLeft,
@@ -27,8 +27,9 @@ const FlashcardManager = ({ documentId }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [setToDelete, setSetToDelete] = useState(null);
+  const generateRequestInFlight = useRef(false);
 
-  const fetchFlashcardSets = async () => {
+  const fetchFlashcardSets = useCallback(async () => {
     setLoading(true);
     try {
       const response = await flashcardService.getFlashcardsForDocument(
@@ -41,23 +42,40 @@ const FlashcardManager = ({ documentId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [documentId]);
 
   useEffect(() => {
     if (documentId) {
       fetchFlashcardSets();
     }
-  }, [documentId]);
+  }, [documentId, fetchFlashcardSets]);
 
   const handleGenerateFlashcards = async () => {
+    if (generateRequestInFlight.current) return;
+    generateRequestInFlight.current = true;
     setGenerating(true);
+
     try {
-      await aiService.generateFlashcards(documentId);
+      const response = await aiService.generateFlashcards(documentId);
+      const generatedSet = response?.data;
+
+      if (!generatedSet?._id) {
+        throw new Error("The server did not return the generated flashcards.");
+      }
+
+      // The POST response contains the saved set, so update the list directly
+      // instead of blanking the page while making a second GET request.
+      setFlashcardSets((currentSets) => [
+        generatedSet,
+        ...currentSets.filter((set) => set._id !== generatedSet._id),
+      ]);
       toast.success("Flashcards generated successfully!");
-      fetchFlashcardSets();
     } catch (error) {
-      toast.error(error.message || "Failed to generate flashcards.");
+      toast.error(
+        error?.error || error?.message || "Failed to generate flashcards.",
+      );
     } finally {
+      generateRequestInFlight.current = false;
       setGenerating(false);
     }
   };
@@ -89,7 +107,7 @@ const FlashcardManager = ({ documentId }) => {
     try {
       await flashcardService.reviewFlashcard(currentCard._id, index);
       toast.success("Flashcard reviewed!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to review flashcard.");
     }
   };
@@ -120,7 +138,7 @@ const handleToggleStar = async (cardId) => {
     });
 
     toast.success("Flashcard starred status updated!");
-  } catch (error) {
+  } catch {
     toast.error("Failed to update star status.");
   }
 };
@@ -134,15 +152,20 @@ const handleToggleStar = async (cardId) => {
 const handleConfirmDelete = async () => {
   if (!setToDelete) return;
 
+  const deletedSetId = setToDelete._id;
   setDeleting(true);
   try {
-    await flashcardService.deleteFlashcardSet(setToDelete._id);
+    await flashcardService.deleteFlashcardSet(deletedSetId);
+    setFlashcardSets((currentSets) =>
+      currentSets.filter((set) => set._id !== deletedSetId),
+    );
     toast.success("Flashcard set deleted successfully!");
     setIsDeleteModalOpen(false);
     setSetToDelete(null);
-    fetchFlashcardSets();
   } catch (error) {
-    toast.error(error.message || "Failed to delete flashcard set.");
+    toast.error(
+      error?.error || error?.message || "Failed to delete flashcard set.",
+    );
   } finally {
     setDeleting(false);
   }
@@ -161,7 +184,7 @@ const renderFlashcardViewer = () => {
       {/* Back Button */}
       <button
         onClick={() => setSelectedSet(null)}
-        className="group inline-flex items-center gap-2 font-medium text-sm text-slate-600 hover:text-emerald-600 transition-colors duration-200"
+        className="group inline-flex items-center gap-2 font-medium text-sm text-slate-400 hover:text-sky-300 transition-colors duration-200"
       >
         <ArrowLeft
           className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
@@ -184,7 +207,7 @@ const renderFlashcardViewer = () => {
   <button
     onClick={handlePrevCard}
     disabled={selectedSet.cards.length <= 1}
-    className="group flex items-center gap-2 px-5 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-100"
+    className="group flex items-center gap-2 px-5 h-11 bg-white/[0.06] hover:bg-white/10 text-slate-300 font-medium text-sm rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/[0.06]"
   >
     <ChevronLeft
       className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200"
@@ -193,8 +216,8 @@ const renderFlashcardViewer = () => {
     Previous
   </button>
 
-  <div className="px-4 py-2 bg-slate-50 rounded-lg border border-slate-200">
-    <span className="text-sm font-semibold text-slate-700">
+  <div className="px-4 py-2 bg-white/[0.04] rounded-lg border border-white/10">
+    <span className="text-sm font-semibold text-slate-300">
       {currentCardIndex + 1}{" "}
       <span className="text-slate-400 font-normal ">/</span>{" "}
       {selectedSet.cards.length}
@@ -204,7 +227,7 @@ const renderFlashcardViewer = () => {
   <button
     onClick={handleNextCard}
     disabled={selectedSet.cards.length <= 1}
-    className="group flex items-center gap-2 px-5 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-slate-100"
+    className="group flex items-center gap-2 px-5 h-11 bg-white/[0.06] hover:bg-white/10 text-slate-300 font-medium text-sm rounded-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/[0.06]"
   >
     Next
     <ChevronRight
@@ -219,7 +242,7 @@ const renderFlashcardViewer = () => {
 };
 
 const renderSetList = () => {
-  if (loading) {
+  if (loading && flashcardSets.length === 0) {
     return (
       <div className="flex items-center justify-center py-20">
         <Spinner />
@@ -231,11 +254,11 @@ if (flashcardSets.length === 0) {
 
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6">
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-emerald-100 to-teal-100 mb-6">
-        <Brain className="w-8 h-8 text-emerald-600" strokeWidth={2} />
+      <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-sky-400/20 bg-sky-500/10">
+        <Brain className="h-8 w-8 text-sky-300" strokeWidth={2} />
       </div>
 
-      <h3 className="text-xl font-semibold text-slate-900 mb-2">
+      <h3 className="text-xl font-semibold text-white mb-2">
         No Flashcards Yet
       </h3>
 
@@ -246,7 +269,7 @@ if (flashcardSets.length === 0) {
       <button
         onClick={handleGenerateFlashcards}
         disabled={generating}
-        className="group inline-flex items-center gap-2 px-6 h-12 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+        className="group inline-flex items-center gap-2 px-6 h-12 bg-linear-to-r from-sky-500 to-sky-500 hover:from-sky-600 hover:to-sky-600 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-sky-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
       >
         {generating ? (
           <>
@@ -269,7 +292,7 @@ return (
     {/* Header with Generate Button */}
     <div className="flex items-center justify-between">
       <div>
-        <h3 className="text-lg font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-white">
           Your Flashcard Sets
         </h3>
         <p className="text-sm text-slate-500 mt-1">
@@ -281,7 +304,7 @@ return (
       <button
         onClick={handleGenerateFlashcards}
         disabled={generating}
-        className="group inline-flex items-center gap-2 px-4 h-11 bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+        className="group inline-flex items-center gap-2 px-4 h-11 bg-linear-to-r from-sky-500 to-sky-500 hover:from-sky-600 hover:to-sky-600 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-lg shadow-sky-500/25 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
       >
         {generating ? (
           <>
@@ -303,24 +326,24 @@ return (
         <div
           key={set._id}
           onClick={() => handleSelectSet(set)}
-          className="group relative bg-white/80 backdrop-blur-xl border-2 border-slate-200 hover:border-emerald-300 rounded-2xl p-6 cursor-pointer transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/10"
+          className="group relative cursor-pointer rounded-2xl border border-white/10 bg-[#111827]/85 p-6 shadow-xl shadow-black/20 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-400/35 hover:shadow-lg hover:shadow-sky-500/10"
         >
           {/* Delete Button */}
           <button
             onClick={(e) => handleDeleteRequest(e, set)}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+            className="absolute right-4 top-4 rounded-lg p-2 text-slate-500 opacity-0 transition-all duration-200 hover:bg-rose-500/10 hover:text-rose-300 group-hover:opacity-100"
           >
             <Trash2 className="w-4 h-4" strokeWidth={2} />
           </button>
 
           {/* Set Content */}
           <div className="space-y-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-linear-to-br from-emerald-100 to-teal-100">
-              <Brain className="w-6 h-6 text-emerald-600" strokeWidth={2} />
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-sky-400/20 bg-sky-500/10">
+              <Brain className="h-6 w-6 text-sky-300" strokeWidth={2} />
             </div>
 
             <div>
-              <h4 className="text-base font-semibold text-slate-900 mb-1">
+              <h4 className="text-base font-semibold text-white mb-1">
                 Flashcard Set
               </h4>
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
@@ -330,8 +353,8 @@ return (
          
 
           <div className="flex items-center gap-2 pt-2 border-slate-100">
-            <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg">
-              <span className="text-sm font-semibold text-emerald-700">
+            <div className="rounded-lg border border-sky-400/20 bg-sky-500/10 px-3 py-1.5">
+              <span className="text-sm font-semibold text-sky-200">
                 {set.cards.length}{" "}
                 {set.cards.length === 1 ? "card" : "cards"}
               </span>
@@ -348,7 +371,7 @@ return (
 
   return (
     <>
-    <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-xl shadow-slate-200/50 p-8">
+    <div className="bg-[#111827]/85 backdrop-blur-xl border border-white/10 rounded-3xl shadow-xl shadow-black/20 p-8">
       {selectedSet ? renderFlashcardViewer() : renderSetList()}
     </div>
 
@@ -359,7 +382,7 @@ return (
   title="Delete Flashcard Set?"
 >
   <div className="space-y-6">
-    <p className="text-sm text-slate-600">
+    <p className="text-sm text-slate-400">
       Are you sure you want to delete this flashcard set? This action cannot be undone and all cards will be permanently removed.
     </p>
 
@@ -368,7 +391,7 @@ return (
         type="button"
         onClick={() => setIsDeleteModalOpen(false)}
         disabled={deleting}
-        className="px-5 h-11 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-5 h-11 bg-white/[0.06] hover:bg-white/10 text-slate-300 font-medium text-sm rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Cancel
       </button>

@@ -92,7 +92,7 @@ const QuizTakePage = () => {
   if (!quiz || !Array.isArray(quiz.questions) || quiz.questions.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-slate-600 text-lg">
+        <p className="text-slate-400 text-lg">
           Quiz not found or has no questions.
         </p>
       </div>
@@ -109,7 +109,7 @@ const QuizTakePage = () => {
 
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-slate-700">
+          <span className="text-sm font-semibold text-slate-300">
             Question {currentQuestionIndex + 1} of {quiz.questions.length}
           </span>
           <span className="text-sm font-medium text-slate-500">
@@ -117,9 +117,9 @@ const QuizTakePage = () => {
           </span>
         </div>
 
-        <div className="relative h-2 bg-slate-100 rounded-full overflow-hidden">
+        <div className="relative h-2 bg-white/[0.06] rounded-full overflow-hidden">
           <div
-            className="absolute inset-y-0 left-0 bg-linear-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500 ease-out"
+            className="absolute inset-y-0 left-0 bg-linear-to-r from-sky-500 to-sky-500 rounded-full transition-all duration-500 ease-out"
             style={{
               width: `${
                 ((currentQuestionIndex + 1) / quiz.questions.length) * 100
@@ -129,15 +129,15 @@ const QuizTakePage = () => {
         </div>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-xl border-2 border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 p-6 mb-8">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl mb-6">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="text-sm font-semibold text-emerald-700">
+      <div className="bg-[#111827]/85 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl shadow-black/20 p-6 mb-8">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-xl border border-sky-400/20 bg-sky-500/10 px-4 py-2">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-sky-400" />
+          <span className="text-sm font-semibold text-sky-200">
             Question {currentQuestionIndex + 1}
           </span>
         </div>
 
-        <h3 className="text-lg font-semibold text-slate-900 mb-6 leading-relaxed">
+        <h3 className="text-lg font-semibold text-white mb-6 leading-relaxed">
           {currentQuestion.question}
         </h3>
 
@@ -151,8 +151,8 @@ const QuizTakePage = () => {
                 key={option}
                 className={`group relative flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                   isSelected
-                    ? "border-emerald-500 bg-emerald-50 shadow-lg shadow-emerald-500/10"
-                    : "border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-white hover:shadow-md"
+                    ? "border-sky-400 bg-sky-500/10 shadow-lg shadow-sky-500/10"
+                    : "border-white/10 bg-white/[0.03] hover:border-sky-400/30 hover:bg-white/[0.05] hover:shadow-md"
                 }`}
               >
                 <input
@@ -168,8 +168,8 @@ const QuizTakePage = () => {
                 <div
                   className={`shrink-0 w-5 h-5 rounded-full border-2 transition-all duration-200 ${
                     isSelected
-                      ? "border-emerald-500 bg-emerald-500"
-                      : "border-slate-300 bg-white group-hover:border-emerald-400"
+                      ? "border-sky-500 bg-sky-500"
+                      : "border-slate-500 bg-white/[0.04] group-hover:border-sky-400"
                   }`}
                 >
                   {isSelected && (
@@ -183,8 +183,8 @@ const QuizTakePage = () => {
                 <span
                   className={`ml-4 text-sm font-medium transition-colors duration-200 ${
                     isSelected
-                      ? "text-emerald-900"
-                      : "text-slate-700 group-hover:text-slate-900"
+                      ? "text-sky-100"
+                      : "text-slate-300 group-hover:text-white"
                   }`}
                 >
                   {option}
@@ -193,7 +193,7 @@ const QuizTakePage = () => {
                     {/* Selected Checkmark*/}
                 {isSelected && (
                   <CheckCircle2
-                    className="ml-auto w-5 h-5 text-emerald-500"
+                    className="ml-auto h-5 w-5 text-sky-300"
                     strokeWidth={2.5}
                   />
                 )}
@@ -219,9 +219,9 @@ const QuizTakePage = () => {
   <button
     onClick={handleSubmitQuiz}
     disabled={submitting || answeredCount !== quiz.questions.length}
-    className="group relative px-8 h-12 bg-linear-to-r from-emerald-500
-    to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold
-    text-sm rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25
+    className="group relative px-8 h-12 bg-linear-to-r from-sky-500
+    to-sky-500 hover:from-sky-600 hover:to-sky-600 text-white font-semibold
+    text-sm rounded-xl transition-all duration-200 shadow-lg shadow-sky-500/25
     active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 overflow-hidden"
   >
     <span className="relative z-10 flex items-center justify-center gap-2">
@@ -269,10 +269,10 @@ return (
     disabled={submitting}
     className={`w-8 h-8 rounded-lg font-semibold text-xs transition-all duration-200
       ${isCurrent
-        ? "bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 scale-110"
+        ? "bg-linear-to-r from-sky-500 to-sky-500 text-white shadow-lg shadow-sky-500/25 scale-110"
         : isAnsweredQuestion
-        ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+        ? "bg-sky-500/15 text-sky-200 hover:bg-sky-500/25"
+        : "bg-white/[0.06] text-slate-400 hover:bg-white/10"
       }
       disabled:opacity-50 disabled:cursor-not-allowed
     `}

@@ -1,194 +1,133 @@
-// Displays the signed-in user's profile details and lets them change their password.
-import React, { useState, useEffect } from "react";
-import PageHeader from "../../components/common/PageHeader";
+// Displays account methods and lets authenticated users add or change a password.
+import React, { useEffect, useState } from "react";
+import { BadgeCheck, Lock, Mail, User } from "lucide-react";
+import toast from "react-hot-toast";
+
 import Button from "../../components/common/Button";
+import PageHeader from "../../components/common/PageHeader";
 import Spinner from "../../components/common/Spinner";
 import authService from "../../services/authService";
-import { useAuth } from "../../context/AuthContext";
-import toast from "react-hot-toast";
-import { User, Mail, Lock } from "lucide-react";
 
 const ProfilePage = () => {
-
   const [loading, setLoading] = useState(true);
   const [passwordLoading, setPasswordLoading] = useState(false);
-
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [profile, setProfile] = useState({
+    username: "",
+    email: "",
+    authProviders: [],
+  });
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
 
-useEffect(() => {
-  const fetchProfile = async () => {
+  const hasPassword = profile.authProviders.includes("password");
+
+  useEffect(() => {
+    authService
+      .getProfile()
+      .then(({ data }) => setProfile(data))
+      .catch((error) => toast.error(error.message || "Failed to load profile."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+    if (newPassword.length < 6) return toast.error("Password must be at least 6 characters.");
+    if (newPassword !== confirmation) return toast.error("Passwords do not match.");
+
+    setPasswordLoading(true);
     try {
-      const { data } = await authService.getProfile();
-      setUsername(data.username);
-      setEmail(data.email);
+      const response = await authService.changePassword({
+        currentPassword: hasPassword ? currentPassword : undefined,
+        newPassword,
+      });
+      setProfile(response.data.user);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmation("");
+      toast.success(response.message);
     } catch (error) {
-      toast.error("Failed to fetch profile data.");
-      console.error(error);
+      toast.error(error.error || error.message || "Failed to update password.");
     } finally {
-      setLoading(false);
+      setPasswordLoading(false);
     }
   };
 
-  fetchProfile();
-}, []);
+  if (loading) return <Spinner />;
 
-const handleChangePassword = async (e) => {
-  e.preventDefault();
-
-  if (newPassword !== confirmNewPassword) {
-    toast.error("New passwords do not match.");
-    return;
-  }
-
-  if (newPassword.length < 6) {
-    toast.error("New password must be at least 6 characters long.");
-    return;
-  }
-
-  setPasswordLoading(true);
-  try {
-    await authService.changePassword({ currentPassword, newPassword });
-    toast.success("Password changed successfully!");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
-  } catch (error) {
-    toast.error(error.message || "Failed to change password.");
-  } finally {
-    setPasswordLoading(false);
-  }
-};
-
-if (loading) {
-  return <Spinner />;
-}
-
+  const fieldShell =
+    "flex h-11 items-center rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm text-slate-100";
+  const inputClass =
+    "h-11 w-full rounded-xl border border-white/10 bg-white/[0.04] pl-10 pr-3 text-sm text-slate-100 focus:border-sky-400 focus:outline-none";
+  const labelClass =
+    "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-300";
 
   return (
     <div>
-      <PageHeader title="Profile Settings" />
-
-      <div className="space-y-8">
-        {/* User Information Display */}
-        <div className="bg-white border border-neutral-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-            User Information
-          </h3>
-
+      <PageHeader eyebrow="Your account" title="Profile settings" subtitle="Review your sign-in methods and keep your LearnQuick account secure." />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <section className="surface-card rounded-[20px] p-6 sm:p-7">
+          <h3 className="mb-5 text-lg font-semibold text-white">Account information</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-neutral-700 mb-1.5">
-                Username
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-4 w-4 text-neutral-400" />
-                </div>
-                <p className="w-full h-9 pl-9 pr-3 pt-2 border border-neutral-200
-                rounded-lg bg-neutral-50 text-sm text-neutral-900">
-                  {username}
-                </p>
-              </div>
+              <label className={labelClass}>Username</label>
+              <div className={fieldShell}><User className="mr-3 h-4 w-4 text-sky-300" />{profile.username}</div>
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-neutral-700 mb-1.5">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center
-                pointer-events-none">
-                  <Mail className="h-4 w-4 text-neutral-400" />
-                </div>
-                <p className="w-full h-9 pl-9 pr-3 pt-2 border border-neutral-200
-                rounded-lg bg-neutral-50 text-sm text-neutral-900">
-                  {email}
-                </p>
-              </div>
+              <label className={labelClass}>Email</label>
+              <div className={fieldShell}><Mail className="mr-3 h-4 w-4 text-sky-300" /><span className="truncate">{profile.email}</span></div>
             </div>
-
+            <div className="flex flex-wrap gap-2 pt-1">
+              {profile.authProviders.map((provider) => (
+                <span key={provider} className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold capitalize text-emerald-200">
+                  <BadgeCheck className="h-4 w-4" />{provider}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Change Password Form */}
-<div className="bg-white border border-neutral-200 rounded-lg p-6">
-  <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-    Change Password
-  </h3>
+        <section className="surface-card rounded-[20px] p-6 sm:p-7">
+          <h3 className="mb-1 text-lg font-semibold text-white">
+            {hasPassword ? "Change password" : "Add email/password sign-in"}
+          </h3>
+          <p className="mb-5 text-sm text-slate-400">
+            {hasPassword
+              ? "Confirm your current password before choosing a new one."
+              : "You signed in with Google. Add a password if you also want email login."}
+          </p>
 
-  <form onSubmit={handleChangePassword} className="space-y-4">
-    <div>
-      <label className="block text-xs font-medium text-neutral-700 mb-1.5">
-        Current Password
-      </label>
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Lock className="h-4 w-4 text-neutral-400" />
-        </div>
-        <input
-          type="password"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          required
-          className="w-full h-9 pl-9 pr-3 border border-neutral-300 rounded-lg
-          bg-white text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150
-          focus:outline-none focus:ring-2 focus:ring-[#00d492] focus:border-transparent"
-        />
-      </div>
-    </div>
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            {hasPassword && (
+              <label className="block">
+                <span className={labelClass}>Current password</span>
+                <span className="relative block">
+                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                  <input type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} autoComplete="current-password" required className={inputClass} />
+                </span>
+              </label>
+            )}
 
-    <div>
-      <label className="block text-xs font-medium text-neutral-700 mb-1.5">
-        New Password
-      </label>
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Lock className="h-4 w-4 text-neutral-400" />
-        </div>
-        <input
-          type="password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-          className="w-full h-9 pl-9 pr-3 border border-neutral-200 rounded-lg bg-white
-          text-sm text-neutral-900 placeholder-neutral-400 transition-colors duration-150
-          focus:outline-none focus:ring-2 focus:ring-[#00d492] focus:border-transparent"
-        />
-      </div>
-    </div>
+            {[
+              ["New password", newPassword, setNewPassword],
+              ["Confirm new password", confirmation, setConfirmation],
+            ].map(([label, value, setter]) => (
+              <label key={label} className="block">
+                <span className={labelClass}>{label}</span>
+                <span className="relative block">
+                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                  <input type="password" value={value} onChange={(event) => setter(event.target.value)} autoComplete="new-password" minLength={6} required className={inputClass} />
+                </span>
+              </label>
+            ))}
 
-    <div>
-      <label className="block text-xs font-medium text-neutral-700 mb-1.5">
-        Confirm New Password
-      </label>
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Lock className="h-4 w-4 text-neutral-400" />
-        </div>
-        <input
-          type="password"
-          value={confirmNewPassword}
-          onChange={(e) => setConfirmNewPassword(e.target.value)}
-          required
-          className="w-full h-9 pl-9 pr-3 border border-neutral-200 rounded-lg
-          bg-white text-sm text-neutral-900 placeholder-neutral-400 transition-colors
-          duration-150 focus:outline-none focus:ring-2 focus:ring-[#00d492] focus:border-transparent"
-        />
-      </div>
-    </div>
-
-    <div className="flex justify-end">
-      <Button type="submit" disabled={passwordLoading}>
-        {passwordLoading ? "Changing..." : "Change Password"}
-      </Button>
-    </div>
-  </form>
-</div>
-
+            <div className="flex justify-end pt-2">
+              <Button type="submit" disabled={passwordLoading}>
+                {passwordLoading ? "Saving..." : hasPassword ? "Change password" : "Add password"}
+              </Button>
+            </div>
+          </form>
+        </section>
       </div>
     </div>
   );

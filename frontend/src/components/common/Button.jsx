@@ -1,43 +1,33 @@
-import React from "react";
-
 const Button = ({
   children,
-  onClick,
   type = "button",
   disabled = false,
+  loading = false,
   className = "",
   variant = "primary",
   size = "md",
+  ...props
 }) => {
-  const baseStyles =
-    "inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 whitespace-nowrap";
-
-  const variantStyles = {
-    primary:
-      "bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-emerald-500/25 hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl hover:shadow-emerald-500/30",
-    secondary: "bg-slate-100 text-slate-700 hover:bg-slate-200",
-    danger:
-      "bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300",
+  const variants = {
+    primary: "bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-orange-500/30",
+    secondary: "border border-stone-200 bg-white text-stone-800 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800 dark:border-white/10 dark:bg-white/[0.04] dark:text-stone-200 dark:hover:bg-orange-500/10 dark:hover:text-orange-200",
+    ghost: "bg-transparent text-stone-600 hover:bg-orange-50 hover:text-orange-800 dark:text-stone-300 dark:hover:bg-orange-500/10 dark:hover:text-orange-200",
+    destructive: "border border-red-300/40 bg-red-500/10 text-red-700 hover:bg-red-600 hover:text-white dark:text-red-300",
+    outline: "border border-stone-200 bg-transparent text-stone-700 hover:border-orange-300 hover:bg-orange-50 dark:border-white/10 dark:text-stone-300 dark:hover:bg-orange-500/10",
+    danger: "border border-red-300/40 bg-red-500/10 text-red-700 hover:bg-red-600 hover:text-white dark:text-red-300",
   };
-
-  const sizeStyles = {
-    sm: "h-9 px-4 text-xs",
-    md: "h-11 px-5 text-sm",
-  };
+  const sizes = { sm: "h-9 px-4 text-xs", md: "h-11 px-5 text-sm", lg: "h-12 px-6 text-sm" };
 
   return (
     <button
       type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={[
-        baseStyles,
-        variantStyles[variant],
-        sizeStyles[size],
-        className,
-      ].join(" ")}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl font-bold transition-all duration-200 active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:transform-none ${variants[variant] || variants.primary} ${sizes[size] || sizes.md} ${className}`}
+      {...props}
     >
-      {children}
+      {loading && <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />}
+      <span className={loading ? "opacity-80" : ""}>{children}</span>
     </button>
   );
 };

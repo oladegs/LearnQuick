@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Accessibility,
   Check,
-  ChevronDown,
   Contrast,
   Eye,
   RotateCcw,
@@ -124,37 +123,29 @@ const AccessibilityMenu = () => {
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        className="relative inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200/70 bg-white/70 px-3 text-sm font-semibold text-slate-700 transition-all duration-200 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700/70 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:bg-slate-700"
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-300 transition-all duration-200 hover:border-sky-400/40 hover:bg-sky-500/10 hover:text-white dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:bg-sky-500/10"
         aria-label="Accessibility options"
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
         <Accessibility size={18} strokeWidth={2.4} />
-        <span className="hidden lg:inline">Accessibility</span>
         {activeCount > 0 && (
-          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-500 px-1 text-xs font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-sky-500 px-1 text-xs font-bold text-white shadow-lg shadow-sky-500/30">
             {activeCount}
           </span>
         )}
-        <ChevronDown
-          size={16}
-          strokeWidth={2.4}
-          className={`transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
       </button>
 
       {isOpen && (
         <div
-          className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-lg border border-slate-200/70 bg-white py-2 shadow-xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-800 dark:shadow-black/30"
+          className="absolute right-0 top-12 z-50 w-72 overflow-hidden rounded-xl border border-white/10 bg-[#111827]/95 py-2 shadow-2xl shadow-black/40 backdrop-blur-xl"
           role="menu"
         >
-          <div className="border-b border-slate-200/70 px-4 py-3 dark:border-slate-700">
-            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          <div className="border-b border-white/10 px-4 py-3">
+            <p className="text-sm font-semibold text-white">
               Accessibility
             </p>
-            <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-xs leading-5 text-slate-400">
               Adjust reading, contrast, and motion preferences.
             </p>
           </div>
@@ -168,20 +159,20 @@ const AccessibilityMenu = () => {
                 key={option.key}
                 type="button"
                 onClick={() => togglePreference(option.key)}
-                className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-slate-100 dark:hover:bg-slate-700/80"
+                className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-sky-500/10"
                 role="menuitemcheckbox"
                 aria-checked={isEnabled}
               >
                 <OptionIcon
                   size={20}
                   strokeWidth={2.5}
-                  className="mt-0.5 shrink-0 text-slate-500 dark:text-slate-300"
+                  className="mt-0.5 shrink-0 text-slate-400"
                 />
                 <span className="flex-1">
-                  <span className="block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  <span className="block text-sm font-semibold text-slate-200">
                     {option.label}
                   </span>
-                  <span className="mt-0.5 block text-xs leading-5 text-slate-500 dark:text-slate-400">
+                  <span className="mt-0.5 block text-xs leading-5 text-slate-400">
                     {option.description}
                   </span>
                 </span>
@@ -189,18 +180,18 @@ const AccessibilityMenu = () => {
                   <Check
                     size={16}
                     strokeWidth={2.5}
-                    className="mt-1 text-emerald-500"
+                    className="mt-1 text-sky-400"
                   />
                 )}
               </button>
             );
           })}
 
-          <div className="border-t border-slate-200/70 px-2 pt-2 dark:border-slate-700">
+          <div className="border-t border-white/10 px-2 pt-2">
             <button
               type="button"
               onClick={resetPreferences}
-              className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left text-sm font-semibold text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-700/80 dark:hover:text-white"
+              className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left text-sm font-semibold text-slate-300 transition-colors duration-150 hover:bg-sky-500/10 hover:text-white"
               role="menuitem"
             >
               <RotateCcw size={18} strokeWidth={2.4} />

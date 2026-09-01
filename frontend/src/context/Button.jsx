@@ -14,10 +14,11 @@ const Button = ({
 
   const variantStyles = {
     primary:
-      "bg-linear-to-r from-emerald-500 to-teal-500 text-white shadow-emerald-500/25 hover:from-emerald-600 hover:to-teal-600 hover:shadow-xl hover:shadow-emerald-500/30",
-    secondary: "bg-slate-100 text-slate-700 hover:bg-slate-200",
+      "bg-sky-500 text-white shadow-lg shadow-sky-500/20 hover:bg-sky-600 hover:shadow-xl hover:shadow-sky-500/30",
+    secondary:
+      "border border-white/10 bg-white/[0.04] text-slate-200 hover:border-sky-400/40 hover:bg-sky-500/10 hover:text-white",
     danger:
-      "bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300",
+      "border border-red-400/30 bg-red-500/10 text-red-200 hover:bg-red-500/20 hover:text-white",
   };
 
   const sizeStyles = {
