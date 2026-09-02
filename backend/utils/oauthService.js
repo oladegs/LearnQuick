@@ -6,8 +6,26 @@ import User from "../models/User.js";
 
 let googleConfiguration;
 
-const getBackendUrl = () =>
-  (process.env.BACKEND_URL || "http://localhost:8000").replace(/\/+$/, "");
+const getBackendUrl = () => {
+  const configuredUrl = process.env.BACKEND_URL?.trim();
+
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/+$/, "");
+  }
+
+  // Keep zero-configuration local development, but never let a production
+  // OAuth request silently send Google back to a developer's computer.
+  if (process.env.NODE_ENV === "production") {
+    const error = new Error(
+      "BACKEND_URL must be configured before Google authentication can run in production.",
+    );
+    error.statusCode = 503;
+    error.oauthCode = "oauth_configuration_error";
+    throw error;
+  }
+
+  return "http://localhost:8000";
+};
 
 const getGoogleDefinition = () => ({
   id: "google",
