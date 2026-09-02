@@ -1,191 +1,154 @@
 # LearnQuick Backend
 
-Express and Node.js backend for LearnQuick, a full-stack MERN app that transforms PDFs and long-form learning material into interactive learning tools using MongoDB, JWT authentication, file uploads, and Google Gemini AI. The platform supports students, busy professionals, readers, researchers, and lifelong learners.
+LearnQuick supports manual email/password accounts and Google as an additional OAuth/OpenID Connect option. Both methods use the same MongoDB `User` collection, so a verified Google email safely links to an existing local account instead of creating a duplicate.
 
-## Tech Stack
+Microsoft and Apple are not exposed.
 
-- Node.js
-- Express
-- MongoDB with Mongoose
-- JWT authentication
-- Bcrypt password hashing
-- Multer file uploads
-- pdf-parse for PDF text extraction
-- Google Gemini AI via `@google/genai`
-- CORS and dotenv
+## 1. Install and configure
 
-## Features
-
-- User authentication with register, login, profile, profile update, and password update APIs
-- MongoDB schemas for User, Document, Flashcard, Quiz, and ChatHistory
-- PDF upload, storage, text extraction, retrieval, update, and delete APIs
-- Static `/uploads` route for uploaded files
-- AI document chat with context-aware Gemini responses
-- AI document summary generation
-- AI concept explanation
-- AI flashcard generation
-- AI quiz generation with configurable question counts
-- Flashcard APIs for listing, reviewing, favoriting, and deleting
-- Quiz APIs for listing, fetching by ID, submitting, result review, and deleting
-- Quiz answer normalization so correct answers are scored reliably even when AI output uses labels like `01`, `A`, or exact option text
-- Dashboard overview API for documents, flashcards, quizzes, and recent activity
-- Central error handling middleware
-
-## Clone The Project
-
-```bash
-git clone <your-github-repository-url>
-cd AILearningAssistant/backend
-```
-
-If you already cloned the full project, go directly into the backend folder:
-
-```bash
+```powershell
 cd backend
-```
-
-## Install Dependencies
-
-```bash
 npm install
+Copy-Item .env.example .env
 ```
 
-## Environment Setup
-
-Create a `.env` file in the backend folder:
+Core `.env` variables:
 
 ```env
-NODE_ENV=development
 PORT=8000
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>/<database-name>
-JWT_SECRET=replace_with_a_long_secure_secret
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+BACKEND_URL=http://localhost:8000
+MONGODB_URI=your_mongodb_connection
+JWT_SECRET=a_long_random_secret
 JWT_EXPIRE=7d
-GEMINI_API_KEY=your_google_gemini_api_key
-MAX_FILE_SIZE=10485760
+OAUTH_COOKIE_SECRET=a_different_long_random_secret
+AUTH_COOKIE_DAYS=7
+COOKIE_SAME_SITE=lax
+GOOGLE_CLIENT_ID=your_google_web_client_id
+GOOGLE_CLIENT_SECRET=your_google_web_client_secret
+GEMINI_API_KEY=your_gemini_key
 ```
 
-### Environment Variables
+Generate each cookie/JWT secret separately:
 
-- `NODE_ENV`: usually `development` locally.
-- `PORT`: backend port. The frontend expects `8000` by default.
-- `MONGODB_URI`: MongoDB connection string.
-- `JWT_SECRET`: secret used to sign authentication tokens.
-- `JWT_EXPIRE`: JWT expiry period, default is `7d` in the auth controller.
-- `GEMINI_API_KEY`: Google Gemini API key used for AI chat, summaries, flashcards, quizzes, and explanations.
-- `MAX_FILE_SIZE`: optional upload size limit in bytes. Default is `10485760` bytes, or 10 MB.
+```powershell
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
 
-## Run The Backend
+## 2. Configure Google as an additional option
 
-Development mode with nodemon:
+1. Open [Google Cloud Console](https://console.cloud.google.com/) and select your project.
+2. Complete **Google Auth Platform > Branding** and **Audience**.
+3. Under **Clients**, create a **Web application** OAuth client.
+4. Add this exact local redirect URI:
 
-```bash
+```text
+http://localhost:8000/api/auth/google/callback
+```
+
+5. Add the production equivalent when deploying:
+
+```text
+https://api.yourdomain.com/api/auth/google/callback
+```
+
+6. Put the generated ID and secret in the two Google `.env` variables, then restart the backend.
+
+The callback must match exactly. See Google's [OpenID Connect guide](https://developers.google.com/identity/openid-connect/openid-connect) and [OAuth client instructions](https://support.google.com/cloud/answer/15549257).
+
+## 3. Configure forgot/reset password email
+
+Add SMTP settings:
+
+```env
+SMTP_HOST=your_smtp_host
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_smtp_user
+SMTP_PASSWORD=your_smtp_password_or_app_password
+EMAIL_FROM="LearnQuick <no-reply@yourdomain.com>"
+```
+
+Use port `587` with `SMTP_SECURE=false` for STARTTLS, or port `465` with `SMTP_SECURE=true`. Reset tokens are random, stored only as SHA-256 hashes, expire after one hour, and are cleared after use.
+
+## 4. Start and test the backend first
+
+```powershell
 npm run dev
 ```
 
-Production-style start:
+Wait for the MongoDB and server-started messages, then run:
 
-```bash
-npm start
+```powershell
+npm run test:auth
 ```
 
-The server should run at:
+The automated test verifies registration, login, HttpOnly-cookie sessions, logout, password reset, password changes, Google linking beside an existing password, adding a password to a Google-only account, and the continued removal of Microsoft/Apple. Synthetic test users are deleted automatically.
+
+## 5. Authentication routes
 
 ```text
-http://localhost:8000
+GET  /api/auth/providers
+POST /api/auth/register
+POST /api/auth/login
+GET  /api/auth/google
+GET  /api/auth/google/callback
+POST /api/auth/forgot-password
+POST /api/auth/reset-password/:token
+GET  /api/auth/session
+POST /api/auth/logout
+GET  /api/auth/profile
+PUT  /api/auth/profile
+POST /api/auth/change-password
 ```
 
-## Startup Checklist
+`/api/auth/microsoft` and `/api/auth/apple` return 404.
 
-When starting the backend, check the terminal for:
+## 6. How account linking works
 
-- `MongoDB Connected: ...`
-- `Server running in development mode on port 8000`
-- No `GEMINI_API_KEY is not set` error
-- No MongoDB authentication or network errors
-- The `uploads` folder exists or can be created/written to
+- Local passwords are bcrypt-hashed and never returned by the API.
+- A Google account may link to an existing user only when Google marks the matching email as verified.
+- The account records both `password` and `google` in `authProviders` when both are enabled.
+- Provider tokens are never stored.
+- A signed-in Google-only user can add a password from Profile Settings.
+- A Google-only user can also use forgot-password to add email/password access after verifying control of the email inbox.
+- OAuth uses authorization code flow, PKCE, `state`, and `nonce`.
+- LearnQuick sessions use signed JWTs and HttpOnly cookies; bearer JWT compatibility remains.
 
-If requests fail from the frontend, check:
-
-- The frontend API base URL points to `http://localhost:8000`.
-- The user is logged in and sending `Authorization: Bearer <token>`.
-- The requested document belongs to the logged-in user.
-- The uploaded document status is ready before calling AI routes.
-- Gemini API quota/key is valid if AI routes fail.
-
-## API Route Groups
-
-Base URL:
+## 7. Feedback routes
 
 ```text
-http://localhost:8000
+POST /api/feedback
+GET  /api/feedback/me
 ```
 
-### Authentication
+Both routes require authentication. The backend takes the user ID, name, and email from the verified session rather than the request body. Submissions are validated, rate limited, checked for rapid duplicates, and stored in the `feedback` MongoDB collection.
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `GET /api/auth/profile`
-- `PUT /api/auth/profile`
-- `POST /api/auth/change-password`
+Run the feedback integration test after starting the backend:
 
-### Documents
-
-- `POST /api/documents/upload`
-- `GET /api/documents`
-- `GET /api/documents/:id`
-- `PUT /api/documents/:id`
-- `DELETE /api/documents/:id`
-
-### AI
-
-- `POST /api/ai/generate-flashcards`
-- `POST /api/ai/generate-quiz`
-- `POST /api/ai/generate-summary`
-- `POST /api/ai/chat`
-- `POST /api/ai/explain-concept`
-- `GET /api/ai/chat-history/:documentId`
-
-### Flashcards
-
-- `GET /api/flashcards`
-- `GET /api/flashcards/:documentId`
-- `POST /api/flashcards/:cardId/review`
-- `PUT /api/flashcards/:cardId/star`
-- `DELETE /api/flashcards/:id`
-
-### Quizzes
-
-- `GET /api/quizzes/:documentId`
-- `GET /api/quizzes/quiz/:id`
-- `POST /api/quizzes/:id/submit`
-- `GET /api/quizzes/:id/results`
-- `DELETE /api/quizzes/:id`
-
-### Progress
-
-- `GET /api/progress/dashboard`
-
-## Main Project Structure
-
-```text
-backend/
-  config/
-  controllers/
-  middleware/
-  models/
-  routes/
-  uploads/
-  utils/
-  server.js
+```powershell
+npm run test:feedback
 ```
 
-## Development Notes
+## 8. Start and test the frontend
 
-- Start MongoDB before running the backend.
-- Start the backend before the frontend.
-- Keep `.env` private and do not commit real secrets.
-- Uploaded PDFs are served from `/uploads`.
-- Gemini-powered routes require extracted document text, so document upload and parsing must complete first.
+```powershell
+cd ..\frontend
+npm install
+npm run dev
+```
+
+Use `VITE_API_URL=http://localhost:8000` in `frontend/.env`. Test manual registration, manual login, Google login, forgot/reset password, Profile Settings password change, refresh persistence, and logout.
+
+Run the automated frontend checks:
+
+```powershell
+npm run lint
+npm run build
+npm run test:auth-ui
+```
 
 ## Author
-- Farouk Oladega
+
+Farouk Oladega

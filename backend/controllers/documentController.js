@@ -32,9 +32,8 @@ export const uploadDocument = async (req, res, next) => {
       });
     }
 
-    // Construct the URL for the uploaded file
-    const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
-    const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
+    // Store a deployment-neutral path; the frontend prefixes its configured API URL.
+    const fileUrl = `/uploads/documents/${req.file.filename}`;
 
     // Create document record in database
     const document = await Document.create({
