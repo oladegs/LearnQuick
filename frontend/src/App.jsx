@@ -1,10 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ErrorBoundary from "./components/common/ErrorBoundary";
@@ -13,6 +8,7 @@ import AppLoading from "./components/common/AppLoading";
 // Each page is downloaded only when its route is visited. This keeps the
 // initial login/dashboard bundle small instead of shipping the entire app.
 const LoginPage = lazy(() => import("./pages/Auth/LoginPage"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 const RegisterPage = lazy(() => import("./pages/Auth/RegisterPage"));
 const ForgotPasswordPage = lazy(() =>
   import("./pages/Auth/ForgotPasswordPage"),
@@ -53,7 +49,7 @@ const App = () => {
       <Router>
         <Suspense fallback={<AppLoading />}>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<LandingPage />} />
 
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />

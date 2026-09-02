@@ -8,7 +8,7 @@ import Button from "../../components/common/Button";
 import { useAuth } from "../../context/AuthContext";
 import authService from "../../services/authService";
 
-const inputClass = "h-12 w-full rounded-xl border border-stone-300 bg-white pl-11 pr-4 text-sm font-medium text-stone-950 placeholder-stone-400 transition-all focus:border-orange-400 focus:ring-4 focus:ring-orange-500/10 dark:border-white/10 dark:bg-black/20 dark:text-white";
+const inputClass = "h-12 w-full rounded-xl border border-stone-300 bg-white pl-11 pr-4 text-sm font-medium text-stone-950 placeholder-stone-400 transition-all focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-black/20 dark:text-white";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -55,7 +55,7 @@ const RegisterPage = () => {
         {error && <p role="alert" className="rounded-xl border border-red-300/50 bg-red-50 p-3 text-sm font-medium text-red-700 dark:border-red-400/20 dark:bg-red-500/10 dark:text-red-200">{error}</p>}
         <Button type="submit" size="lg" loading={loading} className="w-full">Create account{!loading && <ArrowRight className="h-4 w-4" />}</Button>
       </form>
-      <p className="mt-7 border-t border-stone-200 pt-6 text-center text-sm text-stone-600 dark:border-white/10 dark:text-stone-400">Already have an account?{" "}<Link to="/login" className="font-bold text-orange-600 hover:text-orange-700 dark:text-orange-300">Sign in</Link></p>
+      <p className="mt-7 border-t border-stone-200 pt-6 text-center text-sm text-stone-600 dark:border-white/10 dark:text-stone-400">Already have an account?{" "}<Link to="/login" className="font-bold text-blue-600 hover:text-blue-700 dark:text-blue-300">Sign in</Link></p>
     </AuthLayout>
   );
 };

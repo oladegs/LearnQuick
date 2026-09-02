@@ -26,8 +26,8 @@ const AppLayout = ({ children }) => {
 
   return (
     <div className="app-shell relative flex min-h-screen overflow-hidden p-0 md:gap-3 md:p-3">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_4%,rgba(249,115,22,0.11),transparent_27rem)]" />
-      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-orange-600 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_4%,rgba(37,99,235,0.11),transparent_27rem)]" />
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-blue-600 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white">
         Skip to main content
       </a>
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />

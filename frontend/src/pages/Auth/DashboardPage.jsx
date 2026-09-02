@@ -16,6 +16,7 @@ import progressService from "../../services/progressService";
 import Button from "../../components/common/Button";
 import Skeleton from "../../components/common/Skeleton";
 import StatCard from "../../components/common/StatCard";
+import { formatDate, getDateTimestamp } from "../../utils/formatDate";
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -55,7 +56,7 @@ const DashboardPage = () => {
       link: `/quizzes/${quiz._id}`,
       icon: BrainCircuit,
     })),
-  ].filter((activity) => activity.timestamp).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 6), [dashboardData]);
+  ].filter((activity) => getDateTimestamp(activity.timestamp)).sort((a, b) => getDateTimestamp(b.timestamp) - getDateTimestamp(a.timestamp)).slice(0, 6), [dashboardData]);
 
   if (loading) {
     return (
@@ -71,7 +72,7 @@ const DashboardPage = () => {
   if (error || !dashboardData?.overview) {
     return (
       <section className="surface-card mx-auto flex min-h-80 max-w-xl flex-col items-center justify-center rounded-[22px] p-8 text-center">
-        <RefreshCw className="mb-5 h-10 w-10 text-orange-500" />
+        <RefreshCw className="mb-5 h-10 w-10 text-blue-500" />
         <h1 className="text-xl font-bold text-stone-950 dark:text-white">We couldn&apos;t load your dashboard.</h1>
         <p className="mt-2 text-sm text-stone-600 dark:text-stone-400">{error || "Please try again in a moment."}</p>
         <Button onClick={fetchDashboardData} className="mt-6">Try again</Button>
@@ -91,13 +92,13 @@ const DashboardPage = () => {
   return (
     <div className="space-y-6">
       <section className="relative overflow-hidden rounded-[24px] bg-[#171717] p-7 text-white shadow-2xl shadow-stone-950/15 sm:p-9 lg:p-10">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_18%,rgba(249,115,22,0.38),transparent_22rem),linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-size-[auto,32px_32px,32px_32px]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_18%,rgba(37,99,235,0.38),transparent_22rem),linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-size-[auto,32px_32px,32px_32px]" />
         <div className="relative max-w-3xl">
           <p className="eyebrow mb-3">Your learning command center</p>
           <h1 className="text-3xl font-extrabold tracking-[-0.045em] sm:text-4xl lg:text-5xl">Welcome back, {firstName}.</h1>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-stone-400 sm:text-base">Pick up where you left off, or turn a new document into explanations, flashcards, and quizzes.</p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <Link to="/documents?upload=1" className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-5 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition-all hover:-translate-y-0.5 hover:bg-orange-600"><FilePlus2 size={17} />Upload a document</Link>
+            <Link to="/documents?upload=1" className="inline-flex h-11 items-center gap-2 rounded-xl bg-blue-500 px-5 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-0.5 hover:bg-blue-600"><FilePlus2 size={17} />Upload a document</Link>
             {latestDocument && <Link to={`/documents/${latestDocument._id}`} className="inline-flex h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] px-5 text-sm font-bold text-white transition-colors hover:bg-white/10">Continue learning<ArrowRight size={16} /></Link>}
           </div>
         </div>
@@ -111,16 +112,16 @@ const DashboardPage = () => {
         <section className="surface-card rounded-[20px] p-5 sm:p-7">
           <div className="mb-5 flex items-center justify-between gap-4">
             <div><p className="eyebrow mb-2">Your momentum</p><h2 className="text-xl font-extrabold text-stone-950 dark:text-white">Recent activity</h2></div>
-            <Clock3 className="h-5 w-5 text-orange-500" />
+            <Clock3 className="h-5 w-5 text-blue-500" />
           </div>
           {recentActivities.length ? (
             <div className="divide-y divide-stone-200 dark:divide-white/10">
               {recentActivities.map((activity) => (
                 <Link key={`${activity.label}-${activity.id}`} to={activity.link} className="group flex min-h-16 items-center gap-4 py-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-300"><activity.icon size={18} /></span>
-                  <span className="min-w-0 flex-1"><span className="block text-xs font-semibold text-stone-500">{activity.label}</span><span className="block truncate text-sm font-bold text-stone-900 group-hover:text-orange-700 dark:text-stone-100 dark:group-hover:text-orange-300">{activity.title}</span></span>
-                  <span className="hidden text-xs text-stone-500 sm:block">{new Date(activity.timestamp).toLocaleDateString()}</span>
-                  <ArrowRight size={16} className="text-stone-400 transition-transform group-hover:translate-x-1 group-hover:text-orange-500" />
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-300"><activity.icon size={18} /></span>
+                  <span className="min-w-0 flex-1"><span className="block text-xs font-semibold text-stone-500">{activity.label}</span><span className="block truncate text-sm font-bold text-stone-900 group-hover:text-blue-700 dark:text-stone-100 dark:group-hover:text-blue-300">{activity.title}</span></span>
+                  <span className="hidden text-xs text-stone-500 sm:block">{formatDate(activity.timestamp)}</span>
+                  <ArrowRight size={16} className="text-stone-400 transition-transform group-hover:translate-x-1 group-hover:text-blue-500" />
                 </Link>
               ))}
             </div>
@@ -142,10 +143,10 @@ const DashboardPage = () => {
               { icon: BrainCircuit, label: "Create a quiz", detail: "Test your understanding", to: latestDocument ? `/documents/${latestDocument._id}?tab=Quizzes` : "/documents" },
               { icon: MessageSquareText, label: "Ask AI", detail: "Explore your latest source", to: latestDocument ? `/documents/${latestDocument._id}?tab=Chat` : "/documents" },
             ].map((action) => (
-              <Link key={action.label} to={action.to} className="group flex min-h-15 items-center gap-3 rounded-xl border border-stone-200 p-3 transition-all hover:border-orange-300 hover:bg-orange-50 dark:border-white/10 dark:hover:bg-orange-500/10">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-700 group-hover:bg-orange-500 group-hover:text-white dark:bg-white/[0.05] dark:text-stone-300"><action.icon size={17} /></span>
+              <Link key={action.label} to={action.to} className="group flex min-h-15 items-center gap-3 rounded-xl border border-stone-200 p-3 transition-all hover:border-blue-300 hover:bg-blue-50 dark:border-white/10 dark:hover:bg-blue-500/10">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-700 group-hover:bg-blue-500 group-hover:text-white dark:bg-white/[0.05] dark:text-stone-300"><action.icon size={17} /></span>
                 <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-stone-900 dark:text-white">{action.label}</span><span className="block truncate text-xs text-stone-500">{action.detail}</span></span>
-                <Sparkles size={15} className="text-orange-500 opacity-0 transition-opacity group-hover:opacity-100" />
+                <Sparkles size={15} className="text-blue-500 opacity-0 transition-opacity group-hover:opacity-100" />
               </Link>
             ))}
           </div>

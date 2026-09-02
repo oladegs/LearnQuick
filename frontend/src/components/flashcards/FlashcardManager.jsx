@@ -9,7 +9,7 @@ import {
   Brain,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import moment from "moment";
+import { formatDate } from "../../utils/formatDate";
 
 import flashcardService from "../../services/flashcardService";
 import aiService from "../../services/aiService";
@@ -347,7 +347,7 @@ return (
                 Flashcard Set
               </h4>
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Created {moment(set.createdAt).format("MMM D, YYYY")}
+                Created {formatDate(set.createdAt)}
               </p>
             </div>
          

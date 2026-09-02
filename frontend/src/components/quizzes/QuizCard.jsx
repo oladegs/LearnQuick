@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Play, BarChart2, Trash2, Award } from "lucide-react";
-import moment from "moment";
+import { formatDate } from "../../utils/formatDate";
 
 const QuizCard = ({ quiz, onDelete }) => {
 return (
@@ -33,10 +33,10 @@ return (
           title={quiz.title}
         >
           {quiz.title ||
-            `Quiz - ${moment(quiz.createdAt).format("MMM D, YYYY")}`}
+            `Quiz - ${formatDate(quiz.createdAt)}`}
         </h3>
         <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-          Created {moment(quiz.createdAt).format("MMM D, YYYY")}
+          Created {formatDate(quiz.createdAt)}
         </p>
       </div>
 

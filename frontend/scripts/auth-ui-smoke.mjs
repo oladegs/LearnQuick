@@ -149,6 +149,36 @@ try {
     })()`);
   };
 
+  const landing = await openPage(
+    "/",
+    1440,
+    900,
+    "Turn your study material into",
+  );
+  assert(landing.text.includes("Document Intelligence"), "The feature grid is missing.");
+  assert(landing.text.includes("From upload to active understanding"), "The workflow section is missing.");
+  assert(landing.text.includes("Get started"), "The landing-page CTA is missing.");
+
+  const themeBefore = await evaluate(
+    "document.documentElement.classList.contains('dark') ? 'dark' : 'light'",
+  );
+  await evaluate(
+    "document.querySelector('button[aria-label^=\"Switch to\"]')?.click()",
+  );
+  await delay(250);
+  const themeAfter = await evaluate(
+    "document.documentElement.classList.contains('dark') ? 'dark' : 'light'",
+  );
+  assert(themeBefore !== themeAfter, "The direct light/dark toggle did not switch themes.");
+
+  await openPage("/", 390, 844, "Turn your study material into");
+  const mobileLanding = await evaluate(`({
+    hasMenuButton: Boolean(document.querySelector('button[aria-label="Open navigation menu"]')),
+    hasHorizontalOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+  })`);
+  assert(mobileLanding.hasMenuButton, "The mobile landing navigation is missing.");
+  assert(!mobileLanding.hasHorizontalOverflow, "The mobile landing page overflows horizontally.");
+
   const login = await openPage("/login", 1440, 900, "Welcome back");
   assert(login.text.includes("Continue with Google"), "Google login button is missing.");
   assert(!login.microsoftPresent, "Microsoft sign-in is still visible.");
@@ -210,6 +240,9 @@ try {
   console.log(
     JSON.stringify(
       {
+        landingPage: "pass",
+        directThemeToggle: "pass",
+        mobileLanding: "pass",
         desktopLogin: "pass",
         mobileRegistration: "pass",
         emailPasswordForms: "pass",

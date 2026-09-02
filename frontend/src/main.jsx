@@ -5,6 +5,18 @@ import "./index.css";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 
+// Apply the persisted two-state theme before React paints to prevent a light
+// flash when a user has selected dark mode.
+const storedTheme = window.localStorage.getItem("learnquick-theme");
+const initialTheme =
+  storedTheme === "dark" || storedTheme === "light"
+    ? storedTheme
+    : window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+document.documentElement.classList.toggle("dark", initialTheme === "dark");
+document.documentElement.style.colorScheme = initialTheme;
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
@@ -23,7 +35,7 @@ createRoot(document.getElementById("root")).render(
           },
           success: {
             iconTheme: {
-              primary: "#F97316",
+              primary: "#2563EB",
               secondary: "#FFFFFF",
             },
           },

@@ -47,10 +47,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         }`}
       >
         <div className="relative border-b border-white/10 px-5 py-5">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-orange-500/15 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-blue-500/15 to-transparent" />
           <div className="relative flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-500/25">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-lg shadow-blue-500/25">
                 <BrainCircuit size={21} strokeWidth={2.5} />
               </div>
               <div className="min-w-0">
@@ -64,7 +64,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           </div>
 
           <div className="relative mt-5 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-            <div className="mb-2 flex items-center gap-2 text-orange-300">
+            <div className="mb-2 flex items-center gap-2 text-blue-300">
               <Sparkles size={15} strokeWidth={2.5} />
               <span className="text-xs font-bold uppercase tracking-[0.14em]">AI workspace</span>
             </div>
@@ -83,14 +83,14 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
               className={({ isActive }) =>
                 `group relative flex min-h-12 items-center gap-3 overflow-hidden rounded-xl px-3 text-sm font-semibold transition-all duration-200 ${
                   isActive
-                    ? "bg-orange-500 text-white shadow-lg shadow-orange-500/15"
-                    : "text-stone-400 hover:bg-white/[0.06] hover:text-white"
+                    ? "bg-blue-500/15 text-sky-200 ring-1 ring-inset ring-sky-400/25 before:absolute before:left-0 before:top-1/2 before:h-7 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-sky-400"
+                    : "text-slate-300 hover:bg-white/[0.06] hover:text-white"
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isActive ? "bg-black/15 text-white" : "bg-white/[0.04] text-stone-500 group-hover:text-orange-300"}`}>
+                  <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${isActive ? "bg-sky-400/15 text-sky-300" : "bg-white/[0.04] text-slate-400 group-hover:text-sky-300"}`}>
                     <link.icon size={18} strokeWidth={2.3} />
                   </span>
                   <span>{link.text}</span>
@@ -102,7 +102,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
         <div className="border-t border-white/10 p-3">
           <div className="mb-2 flex items-center gap-3 rounded-xl bg-white/[0.04] p-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-300">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
               <User size={17} strokeWidth={2.4} />
             </div>
             <div className="min-w-0 flex-1">

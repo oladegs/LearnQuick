@@ -168,7 +168,7 @@ const DocumentListPage = () => {
     if (filteredDocuments.length === 0) {
       return (
         <div className="surface-card rounded-[20px] border-dashed p-10 text-center">
-          <Search className="mx-auto h-8 w-8 text-orange-500" />
+          <Search className="mx-auto h-8 w-8 text-blue-500" />
           <h3 className="mt-4 text-lg font-bold text-stone-950 dark:text-white">No documents match your search.</h3>
           <p className="mt-1 text-sm text-stone-500">Try a shorter title or clear the search field.</p>
         </div>
@@ -191,7 +191,7 @@ const DocumentListPage = () => {
   return (
     <div className="relative min-h-screen">
       {/* Subtle background pattern */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(249,115,22,0.12)_1px,transparent_1px)] bg-size-[18px_18px] opacity-30" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(37,99,235,0.12)_1px,transparent_1px)] bg-size-[18px_18px] opacity-30" />
 
       <div className="relative max-w-7xl mx-auto">
         {/* Header */}

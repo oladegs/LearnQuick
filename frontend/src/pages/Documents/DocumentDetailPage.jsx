@@ -11,6 +11,7 @@ import FlashcardManager from "../../components/flashcards/FlashcardManager";
 import QuizManager from "../../components/quizzes/QuizManager";
 import toast from "react-hot-toast";
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import { BASE_URL } from "../../utils/apiPaths";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -52,15 +53,17 @@ const DocumentDetailPage = () => {
     const filePath = document.data.filePath;
 
     if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
-      return filePath;
+      const parsedUrl = new URL(filePath);
+      const wasSavedFromLocalDevelopment = ["localhost", "127.0.0.1"].includes(
+        parsedUrl.hostname,
+      );
+
+      return wasSavedFromLocalDevelopment
+        ? `${BASE_URL}${parsedUrl.pathname}`
+        : filePath;
     }
 
-    const baseUrl =
-      import.meta.env.VITE_API_URL ||
-      import.meta.env.REACT_APP_API_URL ||
-      "http://localhost:8000";
-
-    return `${baseUrl}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
+    return `${BASE_URL}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
   };
 
   const renderContent = () => {

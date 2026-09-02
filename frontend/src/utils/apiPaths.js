@@ -1,11 +1,8 @@
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
 
-// Use the deployment-specific URL when provided and keep localhost as a safe
-// development fallback. Removing trailing slashes prevents URLs such as //api.
-export const BASE_URL = (configuredApiUrl || "http://localhost:8000").replace(
-  /\/+$/,
-  "",
-);
+// Vite reads this from frontend/.env in development and the host's environment
+// in production. An empty value keeps same-origin deployments working.
+export const BASE_URL = (configuredApiUrl || "").replace(/\/+$/, "");
 
 export const API_PATHS = {
   AUTH: {

@@ -9,11 +9,11 @@ const Button = ({
   ...props
 }) => {
   const variants = {
-    primary: "bg-orange-500 text-white shadow-lg shadow-orange-500/20 hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-orange-500/30",
-    secondary: "border border-stone-200 bg-white text-stone-800 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-800 dark:border-white/10 dark:bg-white/[0.04] dark:text-stone-200 dark:hover:bg-orange-500/10 dark:hover:text-orange-200",
-    ghost: "bg-transparent text-stone-600 hover:bg-orange-50 hover:text-orange-800 dark:text-stone-300 dark:hover:bg-orange-500/10 dark:hover:text-orange-200",
+    primary: "bg-blue-500 text-white shadow-lg shadow-blue-500/20 hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-blue-500/30",
+    secondary: "border border-stone-200 bg-white text-stone-800 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-800 dark:border-white/10 dark:bg-white/[0.04] dark:text-stone-200 dark:hover:bg-blue-500/10 dark:hover:text-blue-200",
+    ghost: "bg-transparent text-stone-600 hover:bg-blue-50 hover:text-blue-800 dark:text-stone-300 dark:hover:bg-blue-500/10 dark:hover:text-blue-200",
     destructive: "border border-red-300/40 bg-red-500/10 text-red-700 hover:bg-red-600 hover:text-white dark:text-red-300",
-    outline: "border border-stone-200 bg-transparent text-stone-700 hover:border-orange-300 hover:bg-orange-50 dark:border-white/10 dark:text-stone-300 dark:hover:bg-orange-500/10",
+    outline: "border border-stone-200 bg-transparent text-stone-700 hover:border-blue-300 hover:bg-blue-50 dark:border-white/10 dark:text-stone-300 dark:hover:bg-blue-500/10",
     danger: "border border-red-300/40 bg-red-500/10 text-red-700 hover:bg-red-600 hover:text-white dark:text-red-300",
   };
   const sizes = { sm: "h-9 px-4 text-xs", md: "h-11 px-5 text-sm", lg: "h-12 px-6 text-sm" };

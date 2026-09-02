@@ -20,7 +20,7 @@ React frontend for LearnQuick, a full-stack MERN app that turns PDFs and long-fo
 - Forgot/reset password pages and profile password management
 - Protected application routes
 - Dashboard with progress overview and recent activity
-- Orange, white, and charcoal design system with light, dark, and device themes
+- Blue, white, and deep-charcoal design system with direct light/dark switching
 - Document listing and upload modal
 - Embedded PDF viewer in the document details page
 - AI chat interface for document questions
