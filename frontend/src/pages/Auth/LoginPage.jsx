@@ -26,7 +26,7 @@ const LoginPage = () => {
       const session = await authService.login(email, password);
       login(session.user, session.token);
       toast.success("Welcome back to LearnQuick.");
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (requestError) {
       const message = requestError.error || requestError.message || "Unable to sign in.";
       setError(message);

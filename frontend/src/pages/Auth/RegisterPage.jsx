@@ -27,7 +27,7 @@ const RegisterPage = () => {
       const session = await authService.register(username, email, password);
       login(session.user, session.token);
       toast.success("Your learning workspace is ready.");
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (requestError) {
       const message = requestError.error || requestError.message || "Unable to create your account.";
       setError(message);
