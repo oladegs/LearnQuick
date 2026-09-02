@@ -11,7 +11,6 @@ import FlashcardManager from "../../components/flashcards/FlashcardManager";
 import QuizManager from "../../components/quizzes/QuizManager";
 import toast from "react-hot-toast";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { BASE_URL } from "../../utils/apiPaths";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -19,6 +18,9 @@ const DocumentDetailPage = () => {
 
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(true);
+  const [pdfError, setPdfError] = useState("");
   const requestedTab = searchParams.get("tab");
   const availableTabs = ["Content", "Chat", "AI Actions", "Flashcards", "Quizzes"];
   const [activeTab, setActiveTab] = useState(
@@ -46,36 +48,60 @@ const DocumentDetailPage = () => {
     fetchDocumentDetails();
   }, [id]);
 
-  // Helper function to get the full PDF URL
-  const getPdfUrl = () => {
-    if (!document?.data?.filePath) return null;
+  useEffect(() => {
+    if (!document?.data?._id) return undefined;
 
-    const filePath = document.data.filePath;
+    let active = true;
+    let objectUrl;
+    setPdfLoading(true);
+    setPdfError("");
 
-    if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
-      const parsedUrl = new URL(filePath);
-      const wasSavedFromLocalDevelopment = ["localhost", "127.0.0.1"].includes(
-        parsedUrl.hostname,
-      );
+    documentService
+      .getDocumentFile(document.data._id)
+      .then((fileBlob) => {
+        if (!active) return;
+        objectUrl = URL.createObjectURL(fileBlob);
+        setPdfUrl(objectUrl);
+      })
+      .catch((error) => {
+        if (!active) return;
+        setPdfError(
+          error.error || error.message || "The PDF could not be loaded.",
+        );
+      })
+      .finally(() => {
+        if (active) setPdfLoading(false);
+      });
 
-      return wasSavedFromLocalDevelopment
-        ? `${BASE_URL}${parsedUrl.pathname}`
-        : filePath;
-    }
-
-    return `${BASE_URL}${filePath.startsWith("/") ? "" : "/"}${filePath}`;
-  };
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [document?.data?._id]);
 
   const renderContent = () => {
     if (loading) {
       return <Spinner />;
     }
 
-    if (!document || !document.data || !document.data.filePath) {
+    if (!document || !document.data) {
       return <div className="text-center p-8">PDF not available.</div>;
     }
 
-    const pdfUrl = getPdfUrl();
+    if (pdfLoading) return <Spinner />;
+
+    if (pdfError) {
+      return (
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-900 dark:border-amber-400/20 dark:bg-amber-500/10 dark:text-amber-100">
+          <h2 className="font-bold">Original PDF unavailable</h2>
+          <p className="mt-2 text-sm leading-6">{pdfError}</p>
+          <p className="mt-2 text-sm leading-6">
+            Your extracted study content may still be available. Re-upload the
+            PDF to restore the viewer permanently.
+          </p>
+        </div>
+      );
+    }
 
     return (
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#111827]/85 shadow-2xl shadow-black/20">
@@ -88,7 +114,7 @@ const DocumentDetailPage = () => {
             href={pdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-sky-300 hover:text-sky-200
+            className="inline-flex items-center gap-1.5 text-sm text-blue-700 hover:text-blue-800 dark:text-sky-300 dark:hover:text-sky-200
             font-medium transition-colors"
           >
             <ExternalLink size={16} />
@@ -160,7 +186,7 @@ const DocumentDetailPage = () => {
       <div className="mb-4">
         <Link
           to="/documents"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors hover:text-sky-300"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition-colors hover:text-blue-800 dark:text-slate-400 dark:hover:text-sky-300"
         >
           <ArrowLeft size={16} />
           Back to Documents

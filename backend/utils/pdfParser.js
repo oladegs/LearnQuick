@@ -4,12 +4,13 @@ import { PDFParse } from "pdf-parse";
 
 /**
  * Extract text from PDF file
- * @param {string} filePath - Path to PDF file
+ * @param {string | Buffer | Uint8Array} source - PDF path or in-memory data
  * @returns {Promise<{text: string, numPages: number}>}
  */
-export const extractTextFromPDF = async (filePath) => {
+export const extractTextFromPDF = async (source) => {
   try {
-    const dataBuffer = await fs.readFile(filePath);
+    const dataBuffer =
+      typeof source === "string" ? await fs.readFile(source) : source;
     // pdf-parse expects a Uint8Array, not a Buffer
     const parser = new PDFParse(new Uint8Array(dataBuffer));
     const data = await parser.getText();

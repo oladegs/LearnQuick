@@ -11,8 +11,8 @@ const Tabs = ({ tabs, activeTab, setActiveTab }) => {
               onClick={() => setActiveTab(tab.name)}
               className={`relative shrink-0 px-3 pb-4 text-sm font-semibold transition-all duration-200 md:px-6 ${
                 activeTab === tab.name
-                  ? "text-sky-300"
-                  : "text-slate-400 hover:text-white"
+                  ? "text-blue-700 dark:text-sky-300"
+                  : "text-slate-600 hover:text-blue-800 dark:text-slate-400 dark:hover:text-white"
               }`}
             >
               <span className="relative z-10">{tab.label}</span>

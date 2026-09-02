@@ -21,6 +21,25 @@ const getDocumentById = async (id) => {
   }
 };
 
+const getDocumentFile = async (id) => {
+  try {
+    const response = await axiosInstance.get(
+      API_PATHS.DOCUMENTS.GET_DOCUMENT_FILE(id),
+      { responseType: "blob" },
+    );
+    return response.data;
+  } catch (error) {
+    if (error.response?.data instanceof Blob) {
+      try {
+        throw JSON.parse(await error.response.data.text());
+      } catch (parsedError) {
+        if (parsedError?.error) throw parsedError;
+      }
+    }
+    throw error.response?.data || { message: "Failed to load document file" };
+  }
+};
+
 const uploadDocument = async (formData) => {
   try {
     const response = await axiosInstance.post(
@@ -52,6 +71,7 @@ const deleteDocument = async (id) => {
 const documentService = {
   getDocuments,
   getDocumentById,
+  getDocumentFile,
   uploadDocument,
   deleteDocument,
 };

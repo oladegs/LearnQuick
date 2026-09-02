@@ -164,6 +164,9 @@
   }
   html:not(.dark) input::placeholder,
   html:not(.dark) textarea::placeholder { color: #64748b !important; }
+  html:not(.dark) .app-content-shell :is(.text-sky-100, .text-sky-200, .text-sky-300, .text-sky-400) {
+    color: #1d4ed8 !important;
+  }
   html:not(.dark) .bg-sky-500,
   html:not(.dark) .bg-red-500,
   html:not(.dark) [class*="from-sky-500"][class*="text-white"] { color: #ffffff !important; }

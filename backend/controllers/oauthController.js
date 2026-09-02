@@ -110,7 +110,12 @@ export const handleGoogleCallback = async (req, res) => {
     const token = generateAuthToken(user._id);
     setAuthCookie(res, token);
 
-    return res.redirect(`${getFrontendUrl()}/auth/callback`);
+    // The fragment is never sent to Vercel or logged in HTTP requests. It
+    // provides a bearer-token fallback when browsers block cross-site cookies
+    // between the Vercel frontend and Render backend.
+    return res.redirect(
+      `${getFrontendUrl()}/auth/callback#token=${encodeURIComponent(token)}`,
+    );
   } catch (error) {
     console.error("Google OAuth callback error:", {
       message: error.message,

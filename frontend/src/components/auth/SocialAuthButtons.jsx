@@ -79,7 +79,7 @@ const SocialAuthButtons = () => {
             ? "Add Google credentials to the backend .env file"
             : "Continue with Google"
         }
-        className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 text-sm font-semibold text-slate-200 transition-colors hover:border-sky-400/40 hover:bg-sky-500/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-900 transition-colors hover:border-blue-400 hover:bg-blue-50 hover:text-blue-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-sky-400/40 dark:hover:bg-sky-500/10 dark:hover:text-white"
       >
         {openingGoogle ? (
           <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-400/30 border-t-sky-400" />
@@ -90,7 +90,7 @@ const SocialAuthButtons = () => {
       </button>
 
       {unavailable && !statusMessage && (
-        <p className="text-center text-xs text-amber-200/80">
+        <p className="text-center text-xs text-amber-700 dark:text-amber-200/80">
           Google sign-in needs to be configured by the app owner.
         </p>
       )}
@@ -99,18 +99,18 @@ const SocialAuthButtons = () => {
         <p
           id="google-auth-status"
           role="status"
-          className="text-center text-xs text-slate-400"
+          className="text-center text-xs text-slate-600 dark:text-slate-400"
         >
           {statusMessage}
         </p>
       )}
 
       <div className="flex items-center gap-3" aria-hidden="true">
-        <span className="h-px flex-1 bg-white/10" />
+        <span className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
         <span className="text-xs font-medium text-slate-500">
           or continue with email
         </span>
-        <span className="h-px flex-1 bg-white/10" />
+        <span className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
       </div>
     </div>
   );

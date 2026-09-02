@@ -35,6 +35,9 @@ const OAuthCallbackPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, login } = useAuth();
   const callbackErrorCode = searchParams.get("error");
+  const [oauthToken] = useState(() =>
+    new URLSearchParams(window.location.hash.slice(1)).get("token"),
+  );
   const [error, setError] = useState(() =>
     callbackErrorCode
       ? oauthErrors[callbackErrorCode] ||
@@ -47,6 +50,15 @@ const OAuthCallbackPage = () => {
     if (handled.current) return;
     handled.current = true;
     sessionStorage.removeItem("learnquick_oauth_provider");
+
+    if (oauthToken) {
+      localStorage.setItem("token", oauthToken);
+      window.history.replaceState(
+        {},
+        document.title,
+        `${window.location.pathname}${window.location.search}`,
+      );
+    }
 
     if (callbackErrorCode) {
       toast.error(
@@ -64,11 +76,12 @@ const OAuthCallbackPage = () => {
     authService
       .getSession()
       .then(({ user }) => {
-        login(user, null);
+        login(user, oauthToken || null);
         toast.success("Signed in successfully!");
         navigate("/dashboard", { replace: true });
       })
       .catch((sessionError) => {
+        if (oauthToken) localStorage.removeItem("token");
         const message =
           sessionError.error === "Not authorized, no token"
             ? "Your secure sign-in cookie was not received. Please enable cookies and try again."
@@ -78,7 +91,7 @@ const OAuthCallbackPage = () => {
         setError(message);
         toast.error(message);
       });
-  }, [callbackErrorCode, isAuthenticated, login, navigate]);
+  }, [callbackErrorCode, isAuthenticated, login, navigate, oauthToken]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#0B0F19] px-4 py-10">

@@ -1,5 +1,4 @@
 // Handles document uploads, PDF text extraction, document lists, and document cleanup.
-import { stat } from "fs";
 import Document from "../models/Document.js";
 import Flashcard from "../models/Flashcard.js";
 import Quiz from "../models/Quiz.js";
@@ -7,6 +6,26 @@ import { extractTextFromPDF } from "../utils/pdfParser.js";
 import { chunkText } from "../utils/textChunker.js";
 import fs from "fs/promises";
 import mongoose from "mongoose";
+import path from "path";
+
+const getDocumentBucket = () =>
+  new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+    bucketName: "documentFiles",
+  });
+
+const storeDocumentFile = (file, userId) =>
+  new Promise((resolve, reject) => {
+    const uploadStream = getDocumentBucket().openUploadStream(
+      file.originalname,
+      {
+        contentType: "application/pdf",
+        metadata: { userId: String(userId) },
+      },
+    );
+    uploadStream.once("error", reject);
+    uploadStream.once("finish", () => resolve(uploadStream.id));
+    uploadStream.end(file.buffer);
+  });
 
 // @desc    Upload PDF document
 // @route   POST /api/documents/upload
@@ -23,8 +42,6 @@ export const uploadDocument = async (req, res, next) => {
 
     const { title } = req.body;
     if (!title) {
-      // Delete the uploaded file if title is missing
-      await fs.unlink(req.file.path);
       return res.status(400).json({
         success: false,
         error: "Please provide a document title",
@@ -32,21 +49,30 @@ export const uploadDocument = async (req, res, next) => {
       });
     }
 
-    // Store a deployment-neutral path; the frontend prefixes its configured API URL.
-    const fileUrl = `/uploads/documents/${req.file.filename}`;
+    const documentId = new mongoose.Types.ObjectId();
+    const fileId = await storeDocumentFile(req.file, req.user._id);
+    const fileUrl = `/api/documents/${documentId}/file`;
 
     // Create document record in database
-    const document = await Document.create({
-      userId: req.user._id,
-      title,
-      fileName: req.file.originalname,
-      filePath: fileUrl, // Store the URL instead of the path
-      fileSize: req.file.size,
-      status: "processing",
-    });
+    let document;
+    try {
+      document = await Document.create({
+        _id: documentId,
+        userId: req.user._id,
+        title,
+        fileName: req.file.originalname,
+        filePath: fileUrl,
+        fileId,
+        fileSize: req.file.size,
+        status: "processing",
+      });
+    } catch (error) {
+      await getDocumentBucket().delete(fileId).catch(() => {});
+      throw error;
+    }
 
     // Process PDF in background (in production, use a queue like Bull)
-    processPDF(document._id, req.file.path).catch((err) => {
+    processPDF(document._id, req.file.buffer).catch((err) => {
       console.error("Error processing PDF:", err);
     });
 
@@ -56,18 +82,14 @@ export const uploadDocument = async (req, res, next) => {
       message: "Document uploaded successfully. Processing in progress...",
     });
   } catch (error) {
-    // Clean up file on error
-    if (req.file) {
-      await fs.unlink(req.file.path).catch(() => {});
-    }
     next(error);
   }
 };
 
 // Helper function to process PDF
-const processPDF = async (documentId, filePath) => {
+const processPDF = async (documentId, source) => {
   try {
-    const { text } = await extractTextFromPDF(filePath);
+    const { text } = await extractTextFromPDF(source);
 
     // Create chunks
     const chunks = chunkText(text, 500, 50);
@@ -190,6 +212,73 @@ export const getDocument = async (req, res, next) => {
   }
 };
 
+// @desc    Stream the original PDF from durable MongoDB GridFS storage
+// @route   GET /api/documents/:id/file
+// @access  Private
+export const getDocumentFile = async (req, res, next) => {
+  try {
+    const document = await Document.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        error: "Document not found",
+        statusCode: 404,
+      });
+    }
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename*=UTF-8''${encodeURIComponent(document.fileName)}`,
+      "Cache-Control": "private, max-age=3600",
+    });
+
+    if (document.fileId) {
+      const downloadStream = getDocumentBucket().openDownloadStream(
+        document.fileId,
+      );
+      downloadStream.once("error", () => {
+        if (!res.headersSent) {
+          res.status(404).json({
+            success: false,
+            error: "The stored PDF could not be found",
+            statusCode: 404,
+          });
+        } else {
+          res.destroy();
+        }
+      });
+      return downloadStream.pipe(res);
+    }
+
+    // Continue supporting local files created before GridFS was introduced.
+    const pathname = document.filePath.startsWith("http")
+      ? new URL(document.filePath).pathname
+      : document.filePath;
+    const legacyPath = path.resolve(
+      "uploads/documents",
+      path.basename(pathname),
+    );
+
+    try {
+      await fs.access(legacyPath);
+      return res.sendFile(legacyPath);
+    } catch {
+      return res.status(410).json({
+        success: false,
+        error:
+          "The original PDF expired from the previous server storage. Please upload it again once; new uploads are stored permanently.",
+        statusCode: 410,
+      });
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // @desc    Delete document
 // @route   DELETE /api/documents/:id
 // @access  Private
@@ -208,8 +297,18 @@ export const deleteDocument = async (req, res, next) => {
       });
     }
 
-    // Delete file from filesystem
-    await fs.unlink(document.filePath).catch(() => {});
+    if (document.fileId) {
+      await getDocumentBucket().delete(document.fileId).catch(() => {});
+    } else {
+      const pathname = document.filePath.startsWith("http")
+        ? new URL(document.filePath).pathname
+        : document.filePath;
+      const legacyPath = path.resolve(
+        "uploads/documents",
+        path.basename(pathname),
+      );
+      await fs.unlink(legacyPath).catch(() => {});
+    }
 
     // Delete document
     await document.deleteOne();
