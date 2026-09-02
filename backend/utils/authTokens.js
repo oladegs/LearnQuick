@@ -10,7 +10,9 @@ const getSameSite = () => {
   const configured = process.env.COOKIE_SAME_SITE?.toLowerCase();
   return ["lax", "strict", "none"].includes(configured)
     ? configured
-    : "lax";
+    : isProduction()
+      ? "none"
+      : "lax";
 };
 
 const getCookieBaseOptions = () => ({

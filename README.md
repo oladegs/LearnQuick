@@ -8,7 +8,9 @@ LearnQuick is a full-stack AI learning assistant that helps students, busy profe
 - Uses AI to explain concepts, answer document-based questions, generate flashcards, and create quizzes.
 - Supports different learning goals, including exam prep, workplace upskilling, professional reading, research review, and personal knowledge building.
 - Tracks learning activity through documents, flashcards, quiz results, and dashboard progress.
-- Provides a responsive frontend with light/dark appearance options and WCAG-focused accessibility controls.
+- Provides a responsive blue, white, and deep-charcoal interface with light/dark appearance options and WCAG-focused accessibility controls.
+- Supports manual email/password accounts with Google as an additional sign-in and account-creation option.
+- Lets authenticated users submit categorized, rated feedback that is stored securely in MongoDB.
 
 ## Who It Is For
 
@@ -53,6 +55,8 @@ npm run dev
 ```
 
 The backend usually runs on `http://localhost:8000`, and the frontend usually runs on `http://localhost:5173`.
+
+Complete and test the backend before starting frontend authentication. The [backend setup guide](backend/README.md) contains the exact Google callback URLs, production settings, and a backend-first test checklist.
 
 ## Environment Files
 

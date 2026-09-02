@@ -70,9 +70,11 @@ const OAuthCallbackPage = () => {
       })
       .catch((sessionError) => {
         const message =
-          sessionError.error ||
-          sessionError.message ||
-          "Your sign-in session could not be restored.";
+          sessionError.error === "Not authorized, no token"
+            ? "Your secure sign-in cookie was not received. Please enable cookies and try again."
+            : sessionError.error ||
+              sessionError.message ||
+              "Your sign-in session could not be restored.";
         setError(message);
         toast.error(message);
       });

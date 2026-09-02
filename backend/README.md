@@ -30,6 +30,10 @@ GOOGLE_CLIENT_SECRET=your_google_web_client_secret
 GEMINI_API_KEY=your_gemini_key
 ```
 
+Use `COOKIE_SAME_SITE=none` on Render because the Vercel frontend and Render
+API are cross-site. Production cookies are automatically marked `Secure`.
+Keep `COOKIE_SAME_SITE=lax` for local development.
+
 Generate each cookie/JWT secret separately:
 
 ```powershell
